@@ -1,5 +1,4 @@
 #include "Game.h"
-#include "settings.h"
 
 #include <arduino.h>
 
@@ -68,6 +67,11 @@ void JeopardyGame::showTime(){
   if(m_isFalstart)
   {
     m_display.print("ФС");
+    return;
+  }
+  if(m_currentPlayer > -1){
+    m_display.print("К");
+    m_display.print(m_currentPlayer + 1);
     return;
   }
   if (m_secondsLeft < 0)

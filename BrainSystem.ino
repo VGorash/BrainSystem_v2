@@ -27,10 +27,10 @@ void setup() {
   btnStop.attach(stopButtonCallback);
   btnFunc.attach(funcButtonCallback);
 
-  btnP1.attach([](){playerButtonCallback(&btnP1, LED_PLAYER_1);});
-  btnP2.attach([](){playerButtonCallback(&btnP2, LED_PLAYER_2);});
-  btnP3.attach([](){playerButtonCallback(&btnP3, LED_PLAYER_3);});
-  btnP4.attach([](){playerButtonCallback(&btnP4, LED_PLAYER_4);});
+  btnP1.attach([](){playerButtonCallback(&btnP1, 0);});
+  btnP2.attach([](){playerButtonCallback(&btnP2, 1);});
+  btnP3.attach([](){playerButtonCallback(&btnP3, 2);});
+  btnP4.attach([](){playerButtonCallback(&btnP4, 3);});
 
   showGreeting();
 
@@ -85,9 +85,9 @@ void showGreeting(){
   digitalWrite(LED_PLAYER_4, 0);
 }
 
-void playerButtonCallback(Button *button, int led){
+void playerButtonCallback(Button *button, int player){
   if(button->press()) {
-    game->onPlayerButtonPress(led);
+    game->onPlayerButtonPress(player);
   }
 }
 

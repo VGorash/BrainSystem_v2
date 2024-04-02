@@ -1,5 +1,4 @@
 #include "Game.h"
-#include "settings.h"
 
 #include <arduino.h>
 

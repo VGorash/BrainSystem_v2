@@ -3,6 +3,7 @@
 #include <TimerMs.h>
 
 #include "display.h"
+#include "settings.h"
 
 class Game
 { 
@@ -14,7 +15,7 @@ class Game
     
     virtual void onStartButtonPress();
     virtual void onStopButtonPress();
-    virtual void onPlayerButtonPress(const int led);
+    virtual void onPlayerButtonPress(int player);
 
     void switchSound();
 
@@ -40,7 +41,11 @@ class Game
     TimerMs *m_blinkLedTimer;
     int m_blinkingLed;
 
+    int m_currentPlayer = -1;
+
     Display& m_display;
+
+    int leds[4] = {LED_PLAYER_1, LED_PLAYER_2, LED_PLAYER_3, LED_PLAYER_4};
 };
 
 class JeopardyGame : public Game

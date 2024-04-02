@@ -1,5 +1,4 @@
 #include "Game.h"
-#include "settings.h"
 
 #include <arduino.h>
 
@@ -26,7 +25,7 @@ void Game::tick()
   }
 }
 
-void Game::onPlayerButtonPress(const int led)
+void Game::onPlayerButtonPress(int player)
 {
   if(m_isPlayerButtonBlocked)
   {
@@ -38,13 +37,14 @@ void Game::onPlayerButtonPress(const int led)
   
   if(isFalstart)
   {
-    blinkLed(led);
+    blinkLed(leds[player]);
     playSound(TONE_FALSTART, DURATION_FALSTART);
     m_isFalstart = true;
   }
   else
   {
-    digitalWrite(led, 1);
+    m_currentPlayer = player;
+    digitalWrite(leds[player], 1);
     playSound(TONE_PRESS, DURATION_PRESS);
   } 
   updateDisplayState(true);
@@ -102,6 +102,7 @@ void Game::cleanup()
   m_isStarted = false;
   m_isFalstart = false;
   m_isPlayerButtonBlocked = false;
+  m_currentPlayer = -1;
 
   updateDisplayState(true);
 }
@@ -141,9 +142,12 @@ void Game::showTime(){
   if(m_isFalstart)
   {
     m_display.print("ФС");
+    return;
   }
-  else
-  {
-    m_display.print("--");
+  if(m_currentPlayer > -1){
+    m_display.print("К");
+    m_display.print(m_currentPlayer + 1);
+    return;
   }
+  m_display.print("--");
 }
