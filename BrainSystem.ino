@@ -104,7 +104,7 @@ void stopButtonCallback(){
 }
 
 void funcButtonCallback(){
-  if(btnFunc.click()){
+  if(btnFunc.click(2)){
     game->switchSound();
   }
   else if(btnFunc.hold()){

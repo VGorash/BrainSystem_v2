@@ -77,6 +77,7 @@ void Game::switchSound()
 {
   m_isSoundEnabled = !m_isSoundEnabled;
   playSound(4000, 100);
+  updateDisplayState();
 }
 
 void Game::playSound(int freq, int duration)
@@ -131,6 +132,8 @@ void Game::updateDisplayState(bool timeOnly)
     m_display.print(getName());
     m_display.setCursor(110, 0);
     m_display.print(m_isFalstartEnabled ? "Ф/С" : "Б/Ф");
+    m_display.setCursor(38, 7);
+    m_display.print(m_isSoundEnabled? "" : "без звука");
   }
   m_display.setScale(4);
   m_display.setCursor(42, 3);
