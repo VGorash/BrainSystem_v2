@@ -13,7 +13,6 @@
 
 // LED for game signals | Светодиод сигнала старта игры
 #define LED_SIGNAL 13
-
 // Buttons for players 1-4 | Кнопки игроков 1-4
 #define BUTTON_PLAYER_1 A3
 #define BUTTON_PLAYER_2 A2

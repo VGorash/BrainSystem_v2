@@ -3,7 +3,7 @@
 
 #include <arduino.h>
 
-JeopardyGame::JeopardyGame(bool isFalstartEnabled) : Game(isFalstartEnabled)
+JeopardyGame::JeopardyGame(bool isFalstartEnabled, Display& display) : Game(isFalstartEnabled, display)
 {
   m_gameTimer = new TimerMs(1000, 0, 0);
 }
@@ -21,6 +21,7 @@ void JeopardyGame::tick()
   if(m_gameTimer->ready())
   {
     m_secondsLeft--;
+    updateDisplayState(true);
     if(m_secondsLeft <= JEOPARDY_TICKS_START && m_secondsLeft > 0)
     {
       playSound(TONE_TICK, DURATION_TICK);
@@ -41,6 +42,7 @@ void JeopardyGame::onStartButtonPress()
     return;
   }
   m_secondsLeft = JEOPARDY_GAME_TIME;
+  updateDisplayState(true);
   m_gameTimer->start();
   Game::onStartButtonPress();
 }
@@ -48,6 +50,8 @@ void JeopardyGame::onStartButtonPress()
 void JeopardyGame::cleanup()
 { 
   m_gameTimer->stop();
+  m_secondsLeft = -1;
+  updateDisplayState(true);
   
   Game::cleanup();
 }
@@ -56,23 +60,23 @@ Game *JeopardyGame::nextGame()
 {
   if(m_isFalstartEnabled)
   {
-    return new BrainRingGame(false);
+    return new BrainRingGame(false, m_display);
   }
-  return new JeopardyGame(true);
+  return new JeopardyGame(true, m_display);
 }
 
-void JeopardyGame::showType()
+void JeopardyGame::showTime(){
+  if (m_secondsLeft < 0){
+    m_display.print("--");
+    return;
+  }
+  if(m_secondsLeft < 10){
+    m_display.print(0);
+  }
+  m_display.print(m_secondsLeft);
+}
+
+const char* JeopardyGame::getName()
 {
-  digitalWrite(LED_SIGNAL, 1);
-  if(m_isFalstartEnabled)
-  {
-    digitalWrite(LED_PLAYER_2, 1);
-  }
-  else
-  {
-    digitalWrite(LED_PLAYER_3, 1);
-    digitalWrite(LED_PLAYER_4, 1);
-  }
-  delay(1000);
-  cleanup();
+  return "СВОЯ ИГРА";
 }

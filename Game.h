@@ -2,10 +2,12 @@
 
 #include <TimerMs.h>
 
+#include "display.h"
+
 class Game
 { 
   public:
-    Game(bool isFalstartEnabled);
+    Game(bool isFalstartEnabled, Display& display);
     virtual ~Game();
 
     virtual void tick();
@@ -17,11 +19,12 @@ class Game
     void switchSound();
 
     virtual Game* nextGame();
-    // shows game number in binary system using players leds
-    virtual void showType();
-    void showGreeting();
+
+    void updateDisplayState(bool timeOnly=false);
+    virtual void showTime();
 
   protected:
+    virtual const char* getName();
     virtual void cleanup();
     void blinkLed(int led);
     void playSound(int freq, int duration);
@@ -36,12 +39,14 @@ class Game
 
     TimerMs *m_blinkLedTimer;
     int m_blinkingLed;
+
+    Display& m_display;
 };
 
 class JeopardyGame : public Game
 {
   public:
-    JeopardyGame(bool isFalstartEnabled);
+    JeopardyGame(bool isFalstartEnabled, Display& display);
     ~JeopardyGame() override;
 
     void tick() override;
@@ -49,27 +54,31 @@ class JeopardyGame : public Game
     void onStartButtonPress() override;
 
     Game* nextGame() override;
-    void showType() override;
 
    protected:
     void cleanup() override;
+    const char* getName() override;
+    
+    void showTime() override;
 
    protected:
     TimerMs *m_gameTimer;
-    int m_secondsLeft;
+    int m_secondsLeft=-1;
     
 };
 
 class BrainRingGame : public JeopardyGame
 {
   public:
-    BrainRingGame(bool isFalstartEnabled);
+    BrainRingGame(bool isFalstartEnabled, Display& display);
   
     void tick() override;
   
     void onStartButtonPress() override;
 
     Game* nextGame() override;
-    void showType() override;
+
+  protected:
+    const char* getName() override;
 
 };

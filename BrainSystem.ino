@@ -1,8 +1,8 @@
 #include "settings.h"
+#include "display.h"
 #include "Game.h"
 
 #include <EncButton.h>
-
 
 Button btnStart(BUTTON_START, BUTTONS_PIN_MODE);
 Button btnStop(BUTTON_STOP, BUTTONS_PIN_MODE);
@@ -14,9 +14,13 @@ Button btnP3(BUTTON_PLAYER_3, BUTTONS_PIN_MODE);
 Button btnP4(BUTTON_PLAYER_4, BUTTONS_PIN_MODE);
 
 Game *game;
+Display display;
 
 void setup() {
   Serial.begin(9600);
+  display.init();
+  display.textMode(BUF_REPLACE);
+  Wire.setClock(800000L);
   initPins();
   
   btnStart.attach(startButtonCallback);
@@ -28,8 +32,10 @@ void setup() {
   btnP3.attach([](){playerButtonCallback(&btnP3, LED_PLAYER_3);});
   btnP4.attach([](){playerButtonCallback(&btnP4, LED_PLAYER_4);});
 
-  game = new Game(false);
-  game->showGreeting();
+  showGreeting();
+
+  game = new Game(false, display);
+  game->updateDisplayState();
 }
 
 void loop() {
@@ -51,6 +57,32 @@ void initPins() {
   pinMode(LED_PLAYER_3, OUTPUT);
   pinMode(LED_PLAYER_4, OUTPUT);
   pinMode(LED_SIGNAL, OUTPUT);
+}
+
+void showGreeting(){
+  display.clear();
+  display.setCursor(5, 2);
+  display.setScale(2);
+  display.print("System 2.0");
+  display.setCursor(64, 6);
+  display.setScale(1);
+  display.print("by VGorash");
+  digitalWrite(LED_PLAYER_1, 1);
+  tone(BUZZER, 1000, 300);
+  delay(500);
+  digitalWrite(LED_PLAYER_1, 0);
+  digitalWrite(LED_PLAYER_2, 1);
+  tone(BUZZER, 1500, 300);
+  delay(500);
+  digitalWrite(LED_PLAYER_2, 0);
+  digitalWrite(LED_PLAYER_3, 1);
+  tone(BUZZER, 2000, 300);
+  delay(500);
+  digitalWrite(LED_PLAYER_3, 0);
+  digitalWrite(LED_PLAYER_4, 1);
+  tone(BUZZER, 2500, 300);
+  delay(500);
+  digitalWrite(LED_PLAYER_4, 0);
 }
 
 void playerButtonCallback(Button *button, int led){
@@ -79,6 +111,6 @@ void funcButtonCallback(){
     Game *temp = game;
     game = game->nextGame();
     delete temp;
-    game->showType();
+    game->updateDisplayState();
   }
 }

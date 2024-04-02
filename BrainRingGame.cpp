@@ -4,7 +4,9 @@
 #include <arduino.h>
 
 
-BrainRingGame::BrainRingGame(bool isFalstartEnabled) : JeopardyGame(isFalstartEnabled){}
+BrainRingGame::BrainRingGame(bool isFalstartEnabled, Display& display) : JeopardyGame(isFalstartEnabled, display)
+{
+}
 
 void BrainRingGame::tick()
 {
@@ -14,6 +16,7 @@ void BrainRingGame::tick()
   if(m_gameTimer->ready())
   {
     m_secondsLeft--;
+    updateDisplayState(true);
     if(m_secondsLeft == BRAIN_PRE_END_TIME - 1)
     {
       playSound(TONE_TICK, DURATION_END);
@@ -50,6 +53,7 @@ void BrainRingGame::onStartButtonPress()
     digitalWrite(LED_SIGNAL, 1);
     playSound(TONE_START, DURATION_START);
     m_secondsLeft = BRAIN_WA_TIME;
+    updateDisplayState(true);
     m_gameTimer->start();
     return;
   }
@@ -58,6 +62,7 @@ void BrainRingGame::onStartButtonPress()
   digitalWrite(LED_SIGNAL, 1);
   playSound(TONE_START, DURATION_START);
   m_secondsLeft = BRAIN_GAME_TIME;
+  updateDisplayState(true);
   m_gameTimer->start();
 }
 
@@ -65,24 +70,12 @@ Game *BrainRingGame::nextGame()
 {
   if(m_isFalstartEnabled)
   {
-    return new Game(false);
+    return new Game(false, m_display);
   }
-  return new BrainRingGame(true);
+  return new BrainRingGame(true, m_display);
 }
 
-void BrainRingGame::showType()
+const char* BrainRingGame::getName()
 {
-  digitalWrite(LED_SIGNAL, 1);
-  if(m_isFalstartEnabled)
-  {
-    digitalWrite(LED_PLAYER_2, 1);
-    digitalWrite(LED_PLAYER_3, 1);
-  }
-  else
-  {
-    digitalWrite(LED_PLAYER_2, 1);
-    digitalWrite(LED_PLAYER_4, 1);
-  }
-  delay(1000);
-  cleanup();
+  return "БРЕЙН-РИНГ";
 }

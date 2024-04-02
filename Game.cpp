@@ -5,9 +5,10 @@
 
 #define LED_BLINK_PERIOD 500
 
-Game::Game(bool isFalstartEnabled) : m_isFalstartEnabled(isFalstartEnabled)
+Game::Game(bool isFalstartEnabled, Display& display) : m_isFalstartEnabled(isFalstartEnabled), m_display(display)
 {
   m_blinkLedTimer = new TimerMs(LED_BLINK_PERIOD, 0, 0);
+  
 }
 
 Game::~Game()
@@ -106,42 +107,32 @@ Game *Game::nextGame()
 {
   if(m_isFalstartEnabled)
   {
-    return new JeopardyGame(false);
+    return new JeopardyGame(false, m_display);
   }
-  return new Game(true);
+  return new Game(true, m_display);
 }
 
-void Game::showType()
+const char* Game::getName()
 {
-  digitalWrite(LED_SIGNAL, 1);
-  if(m_isFalstartEnabled)
-  {
-    digitalWrite(LED_PLAYER_3, 1);
-  }
-  else
-  {
-    digitalWrite(LED_PLAYER_4, 1);
-  }
-  delay(1000);
-  cleanup();
+  return "БЕЗ ОТСЧЕТА";
 }
 
-void Game::showGreeting()
+void Game::updateDisplayState(bool timeOnly)
 {
-  digitalWrite(LED_PLAYER_1, 1);
-  playSound(1000, 300);
-  delay(500);
-  digitalWrite(LED_PLAYER_1, 0);
-  digitalWrite(LED_PLAYER_2, 1);
-  playSound(1500, 300);
-  delay(500);
-  digitalWrite(LED_PLAYER_2, 0);
-  digitalWrite(LED_PLAYER_3, 1);
-  playSound(2000, 300);
-  delay(500);
-  digitalWrite(LED_PLAYER_3, 0);
-  digitalWrite(LED_PLAYER_4, 1);
-  playSound(2500, 300);
-  delay(500);
-  digitalWrite(LED_PLAYER_4, 0);
+  if(!timeOnly){
+    m_display.clear();
+    m_display.setScale(1);
+    m_display.home();
+    m_display.print(getName());
+    m_display.setCursor(110, 0);
+    m_display.print(m_isFalstartEnabled ? "Ф/С" : "Б/Ф");
+  }
+  m_display.setScale(4);
+  m_display.setCursor(42, 3);
+  showTime();
+  m_display.update();
+}
+
+void Game::showTime(){
+  m_display.print("--");
 }
