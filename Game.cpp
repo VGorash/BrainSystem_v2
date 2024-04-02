@@ -47,6 +47,7 @@ void Game::onPlayerButtonPress(const int led)
     digitalWrite(led, 1);
     playSound(TONE_PRESS, DURATION_PRESS);
   } 
+  updateDisplayState(true);
 }
 
 void Game::onStopButtonPress()
@@ -101,6 +102,8 @@ void Game::cleanup()
   m_isStarted = false;
   m_isFalstart = false;
   m_isPlayerButtonBlocked = false;
+
+  updateDisplayState(true);
 }
 
 Game *Game::nextGame()
@@ -119,7 +122,8 @@ const char* Game::getName()
 
 void Game::updateDisplayState(bool timeOnly)
 {
-  if(!timeOnly){
+  if(!timeOnly)
+  {
     m_display.clear();
     m_display.setScale(1);
     m_display.home();
@@ -134,5 +138,12 @@ void Game::updateDisplayState(bool timeOnly)
 }
 
 void Game::showTime(){
-  m_display.print("--");
+  if(m_isFalstart)
+  {
+    m_display.print("ФС");
+  }
+  else
+  {
+    m_display.print("--");
+  }
 }

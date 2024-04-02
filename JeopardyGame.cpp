@@ -51,7 +51,6 @@ void JeopardyGame::cleanup()
 { 
   m_gameTimer->stop();
   m_secondsLeft = -1;
-  updateDisplayState(true);
   
   Game::cleanup();
 }
@@ -66,11 +65,18 @@ Game *JeopardyGame::nextGame()
 }
 
 void JeopardyGame::showTime(){
-  if (m_secondsLeft < 0){
+  if(m_isFalstart)
+  {
+    m_display.print("ФС");
+    return;
+  }
+  if (m_secondsLeft < 0)
+  {
     m_display.print("--");
     return;
   }
-  if(m_secondsLeft < 10){
+  if(m_secondsLeft < 10)
+  {
     m_display.print(0);
   }
   m_display.print(m_secondsLeft);
