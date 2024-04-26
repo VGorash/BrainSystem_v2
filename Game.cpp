@@ -37,14 +37,24 @@ void Game::onPlayerButtonPress(int player)
   
   if(isFalstart)
   {
-    blinkLed(leds[player]);
+    // local button
+    if(player < 4)
+    {
+      blinkLed(leds[player]);
+    }
+    sendUartData(UART_SLAVE_BLINK_LED, player);
     playSound(TONE_FALSTART, DURATION_FALSTART);
     m_isFalstart = true;
   }
   else
   {
+    // local button
+    if(player < 4)
+    {
+      digitalWrite(leds[player], 1);
+    }
+    sendUartData(UART_SLAVE_ENABLE_LED, player);
     m_currentPlayer = player;
-    digitalWrite(leds[player], 1);
     playSound(TONE_PRESS, DURATION_PRESS);
   } 
   updateDisplayState(true);
@@ -63,6 +73,7 @@ void Game::onStartButtonPress()
   }
   m_isStarted = true;
   digitalWrite(LED_SIGNAL, 1);
+  sendUartData(UART_SLAVE_ENABLE_SIGNAL);
   playSound(TONE_START, DURATION_START);
 }
 
@@ -106,6 +117,7 @@ void Game::cleanup()
   m_currentPlayer = -1;
 
   updateDisplayState(true);
+  sendUartData(UART_SLAVE_CLEANUP);
 }
 
 Game *Game::nextGame()
@@ -153,4 +165,22 @@ void Game::showTime(){
     return;
   }
   m_display.print("--");
+}
+
+void Game::sendUartData(byte command, byte payload)
+{
+  Serial.write(command | payload);
+}
+
+void Game::onUartDataReceive(byte data)
+{
+  byte command = data & 0xF0;
+  byte payload = data & 0x0F;
+
+  if(command == UART_SLAVE_PLAYER_BUTTON_PRESSED)
+  {
+    if(payload < 4){
+      onPlayerButtonPress(payload + 4);
+    }
+  }
 }

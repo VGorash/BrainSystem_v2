@@ -32,13 +32,15 @@ void setup() {
   btnP3.attach([](){playerButtonCallback(&btnP3, 2);});
   btnP4.attach([](){playerButtonCallback(&btnP4, 3);});
 
-  showGreeting();
+  //showGreeting();
 
-  game = new Game(false, display);
+  game = new EightButtonsGame(false, display);
   game->updateDisplayState();
 }
 
 void loop() {
+  checkUart();
+
   game->tick();
   
   btnStart.tick();
@@ -112,5 +114,18 @@ void funcButtonCallback(){
     game = game->nextGame();
     delete temp;
     game->updateDisplayState();
+  }
+}
+
+void checkUart()
+{
+  if(Serial.available())
+  {
+    int data = Serial.read();
+    if(data == -1)
+    {
+      return;
+    }
+    game->onUartDataReceive((byte)data);
   }
 }

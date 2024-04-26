@@ -5,6 +5,14 @@
 #include "display.h"
 #include "settings.h"
 
+// Slave mode (8 buttons)
+#define UART_SLAVE_PLAYER_BUTTON_PRESSED 0x00
+#define UART_SLAVE_CLEANUP 0x10
+#define UART_SLAVE_ENABLE_LED 0x20
+#define UART_SLAVE_BLINK_LED 0x30
+#define UART_SLAVE_ENABLE_SIGNAL 0x40
+#define UART_SLAVE_TIME_EVENT 0x80
+
 class Game
 { 
   public:
@@ -16,6 +24,7 @@ class Game
     virtual void onStartButtonPress();
     virtual void onStopButtonPress();
     virtual void onPlayerButtonPress(int player);
+    virtual void onUartDataReceive(byte data);
 
     void switchSound();
 
@@ -29,6 +38,7 @@ class Game
     virtual void cleanup();
     void blinkLed(int led);
     void playSound(int freq, int duration);
+    void sendUartData(byte command, byte payload=0x00);
 
   protected:
     bool m_isPlayerButtonBlocked = false;
@@ -36,7 +46,7 @@ class Game
     bool m_isFalstart = false;
 
     bool m_isFalstartEnabled = false;
-    bool m_isSoundEnabled = true;
+    bool m_isSoundEnabled = false;
 
     TimerMs *m_blinkLedTimer;
     int m_blinkingLed;
@@ -86,4 +96,20 @@ class BrainRingGame : public JeopardyGame
   protected:
     const char* getName() override;
 
+};
+
+class EightButtonsGame : public Game
+{
+  public:
+    EightButtonsGame(bool isFalstartEnabled, Display& display);
+
+    void onPlayerButtonPress(int player) override;
+    void onStartButtonPress() override;
+    void onStopButtonPress() override;
+    void onUartDataReceive(byte data) override;
+
+    Game* nextGame() override;
+
+  protected:
+    const char* getName() override;
 };

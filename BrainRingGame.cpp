@@ -51,6 +51,7 @@ void BrainRingGame::onStartButtonPress()
     m_isStarted = true;
     digitalWrite(LED_SIGNAL, 1);
     playSound(TONE_START, DURATION_START);
+    sendUartData(UART_SLAVE_ENABLE_SIGNAL);
     m_secondsLeft = BRAIN_WA_TIME;
     updateDisplayState(true);
     m_gameTimer->start();
@@ -60,6 +61,7 @@ void BrainRingGame::onStartButtonPress()
   m_isStarted = true;
   digitalWrite(LED_SIGNAL, 1);
   playSound(TONE_START, DURATION_START);
+  sendUartData(UART_SLAVE_ENABLE_SIGNAL);
   m_secondsLeft = BRAIN_GAME_TIME;
   updateDisplayState(true);
   m_gameTimer->start();
@@ -69,7 +71,7 @@ Game *BrainRingGame::nextGame()
 {
   if(m_isFalstartEnabled)
   {
-    return new Game(false, m_display);
+    return new EightButtonsGame(false, m_display);
   }
   return new BrainRingGame(true, m_display);
 }

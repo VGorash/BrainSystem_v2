@@ -41,9 +41,9 @@ void JeopardyGame::onStartButtonPress()
     return;
   }
   m_secondsLeft = JEOPARDY_GAME_TIME;
-  updateDisplayState(true);
   m_gameTimer->start();
   Game::onStartButtonPress();
+  updateDisplayState(true);
 }
 
 void JeopardyGame::cleanup()
@@ -84,6 +84,7 @@ void JeopardyGame::showTime(){
     m_display.print(0);
   }
   m_display.print(m_secondsLeft);
+  sendUartData(UART_SLAVE_TIME_EVENT, m_secondsLeft);
 }
 
 const char* JeopardyGame::getName()
