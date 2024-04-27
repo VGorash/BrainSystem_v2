@@ -4,6 +4,8 @@
 
 #include "display.h"
 #include "settings.h"
+#include "Storage.h"
+#include "Runnable.h"
 
 // Slave mode (8 buttons)
 #define UART_SLAVE_PLAYER_BUTTON_PRESSED 0x00
@@ -13,29 +15,32 @@
 #define UART_SLAVE_ENABLE_SIGNAL 0x40
 #define UART_SLAVE_TIME_EVENT 0x80
 
-class Game
+class Game : public Runnable
 { 
   public:
     Game(bool isFalstartEnabled, Display& display);
     virtual ~Game();
 
-    virtual void tick();
+    void tick() override;
     
-    virtual void onStartButtonPress();
-    virtual void onStopButtonPress();
-    virtual void onPlayerButtonPress(int player);
-    virtual void onUartDataReceive(byte data);
+    void onStartButtonPress() override;
+    void onStopButtonPress() override;
+    void onPlayerButtonPress(int player) override;
+    void onUartDataReceive(byte data) override;
 
-    void switchSound();
+    void switchSound() override;
 
-    virtual Game* nextGame();
+    static Game* fromState(const State& state, Display& display);
 
-    void updateDisplayState(bool timeOnly=false);
-    virtual void showTime();
+  
+  public:
+    const static int totalGames = 4;
 
   protected:
     virtual const char* getName();
     virtual void cleanup();
+    virtual void showTime();
+    void updateDisplayState(bool timeOnly=false);
     void blinkLed(int led);
     void playSound(int freq, int duration);
     void sendUartData(byte command, byte payload=0x00);
@@ -55,7 +60,7 @@ class Game
 
     Display& m_display;
 
-    int leds[4] = {LED_PLAYER_1, LED_PLAYER_2, LED_PLAYER_3, LED_PLAYER_4};
+    const int leds[4] = {LED_PLAYER_1, LED_PLAYER_2, LED_PLAYER_3, LED_PLAYER_4};
 };
 
 class JeopardyGame : public Game
@@ -67,8 +72,6 @@ class JeopardyGame : public Game
     void tick() override;
 
     void onStartButtonPress() override;
-
-    Game* nextGame() override;
 
    protected:
     void cleanup() override;
@@ -91,8 +94,6 @@ class BrainRingGame : public JeopardyGame
   
     void onStartButtonPress() override;
 
-    Game* nextGame() override;
-
   protected:
     const char* getName() override;
 
@@ -107,8 +108,6 @@ class EightButtonsGame : public Game
     void onStartButtonPress() override;
     void onStopButtonPress() override;
     void onUartDataReceive(byte data) override;
-
-    Game* nextGame() override;
 
   protected:
     const char* getName() override;

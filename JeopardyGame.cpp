@@ -54,15 +54,6 @@ void JeopardyGame::cleanup()
   Game::cleanup();
 }
 
-Game *JeopardyGame::nextGame()
-{
-  if(m_isFalstartEnabled)
-  {
-    return new BrainRingGame(false, m_display);
-  }
-  return new JeopardyGame(true, m_display);
-}
-
 void JeopardyGame::showTime(){
   if(m_isFalstart)
   {

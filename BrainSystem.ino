@@ -1,6 +1,7 @@
 #include "settings.h"
 #include "display.h"
 #include "Game.h"
+#include "Storage.h"
 
 #include <EncButton.h>
 
@@ -13,8 +14,9 @@ Button btnP2(BUTTON_PLAYER_2, BUTTONS_PIN_MODE);
 Button btnP3(BUTTON_PLAYER_3, BUTTONS_PIN_MODE);
 Button btnP4(BUTTON_PLAYER_4, BUTTONS_PIN_MODE);
 
-Game *game;
+Runnable *game;
 Display display;
+Storage storage;
 
 void setup() {
   Serial.begin(9600);
@@ -34,8 +36,7 @@ void setup() {
 
   //showGreeting();
 
-  game = new EightButtonsGame(false, display);
-  game->updateDisplayState();
+  game = Game::fromState(storage.getState(), display);
 }
 
 void loop() {
@@ -110,11 +111,26 @@ void funcButtonCallback(){
     game->switchSound();
   }
   else if(btnFunc.hold()){
-    Game *temp = game;
-    game = game->nextGame();
-    delete temp;
-    game->updateDisplayState();
+    changeGame();
   }
+}
+
+void changeGame()
+{
+  Game *temp = game;
+  State state = storage.getState();
+  if(state.isFalstartEnabled)
+  {
+    state.gameNumber = (state.gameNumber + 1) % Game::totalGames;
+    state.isFalstartEnabled = false;
+  }
+  else
+  {
+    state.isFalstartEnabled = true;
+  }
+  storage.setState(state);
+  game = Game::fromState(state, display);
+  delete temp;
 }
 
 void checkUart()

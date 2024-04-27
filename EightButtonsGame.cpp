@@ -14,11 +14,6 @@ void EightButtonsGame::onStartButtonPress(){}
 
 void EightButtonsGame::onStopButtonPress(){}
 
-Game *EightButtonsGame::nextGame()
-{
-  return new Game(false, m_display);
-}
-
 const char* EightButtonsGame::getName()
 {
   return "8 КНОПОК";

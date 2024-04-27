@@ -67,15 +67,6 @@ void BrainRingGame::onStartButtonPress()
   m_gameTimer->start();
 }
 
-Game *BrainRingGame::nextGame()
-{
-  if(m_isFalstartEnabled)
-  {
-    return new EightButtonsGame(false, m_display);
-  }
-  return new BrainRingGame(true, m_display);
-}
-
 const char* BrainRingGame::getName()
 {
   return "БРЕЙН-РИНГ";

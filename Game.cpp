@@ -7,7 +7,6 @@
 Game::Game(bool isFalstartEnabled, Display& display) : m_isFalstartEnabled(isFalstartEnabled), m_display(display)
 {
   m_blinkLedTimer = new TimerMs(LED_BLINK_PERIOD, 0, 0);
-  
 }
 
 Game::~Game()
@@ -120,13 +119,33 @@ void Game::cleanup()
   sendUartData(UART_SLAVE_CLEANUP);
 }
 
-Game *Game::nextGame()
+static Game* Game::fromState(const State &state, Display& display)
 {
-  if(m_isFalstartEnabled)
+  Game* game;
+  switch(state.gameNumber)
   {
-    return new JeopardyGame(false, m_display);
+    case(1):
+    {
+      game = new JeopardyGame(state.isFalstartEnabled, display);
+      break;
+    }
+    case(2):
+    {
+      game = new BrainRingGame(state.isFalstartEnabled, display);
+      break;
+    }
+    case(3):
+    {
+      game = new EightButtonsGame(state.isFalstartEnabled, display);
+      break;
+    }
+    default:
+    {
+      game = new Game(state.isFalstartEnabled, display);
+    }
   }
-  return new Game(true, m_display);
+  game->updateDisplayState();
+  return game;
 }
 
 const char* Game::getName()
