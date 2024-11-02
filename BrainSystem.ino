@@ -1,6 +1,7 @@
 #include "settings.h"
 #include "display.h"
 #include "Game.h"
+#include "SettingsWindow.h"
 #include "Storage.h"
 
 #include <EncButton.h>
@@ -14,9 +15,8 @@ Button btnP2(BUTTON_PLAYER_2, BUTTONS_PIN_MODE);
 Button btnP3(BUTTON_PLAYER_3, BUTTONS_PIN_MODE);
 Button btnP4(BUTTON_PLAYER_4, BUTTONS_PIN_MODE);
 
-Runnable *game;
+Runnable *window;
 Display display;
-Storage storage;
 
 void setup() {
   Serial.begin(9600);
@@ -34,15 +34,15 @@ void setup() {
   btnP3.attach([](){playerButtonCallback(&btnP3, 2);});
   btnP4.attach([](){playerButtonCallback(&btnP4, 3);});
 
-  //showGreeting();
+  showGreeting();
 
-  game = Game::fromState(storage.getState(), display);
+  window = Game::fromState(Storage::getState(), display);
 }
 
 void loop() {
   checkUart();
 
-  game->tick();
+  window->tick();
   
   btnStart.tick();
   btnStop.tick();
@@ -90,25 +90,25 @@ void showGreeting(){
 
 void playerButtonCallback(Button *button, int player){
   if(button->press()) {
-    game->onPlayerButtonPress(player);
+    window->onPlayerButtonPress(player);
   }
 }
 
 void startButtonCallback(){
   if(btnStart.press()){
-    game->onStartButtonPress();
+    window->onStartButtonPress();
   }
 }
 
 void stopButtonCallback(){
   if(btnStop.press()){
-    game->onStopButtonPress();
+    window->onStopButtonPress();
   }
 }
 
 void funcButtonCallback(){
-  if(btnFunc.click(2)){
-    game->switchSound();
+  if(btnFunc.click()){
+    window->onFuncButtonPress();
   }
   else if(btnFunc.hold()){
     changeGame();
@@ -117,20 +117,17 @@ void funcButtonCallback(){
 
 void changeGame()
 {
-  Game *temp = game;
-  State state = storage.getState();
-  if(state.isFalstartEnabled)
+  bool isSettings = strcmp(window->getName(), "НАСТРОЙКИ") == 0;
+  delete window;
+  State state = Storage::getState();
+  if(isSettings)
   {
-    state.gameNumber = (state.gameNumber + 1) % Game::totalGames;
-    state.isFalstartEnabled = false;
+    window = Game::fromState(state, display);
   }
   else
   {
-    state.isFalstartEnabled = true;
+    window = new SettingsWindow(state, display);
   }
-  storage.setState(state);
-  game = Game::fromState(state, display);
-  delete temp;
 }
 
 void checkUart()
@@ -142,6 +139,6 @@ void checkUart()
     {
       return;
     }
-    game->onUartDataReceive((byte)data);
+    window->onUartDataReceive((byte)data);
   }
 }

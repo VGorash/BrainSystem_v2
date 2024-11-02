@@ -2,7 +2,7 @@
 
 struct State
 {
-  int gameNumber = 0;
+  int gameNumber = 1;
   bool isFalstartEnabled = false;
   bool isSoundOn = false;
 };
@@ -10,11 +10,6 @@ struct State
 class Storage
 {
   public:
-    Storage();
-
-    void setState(const State& newState);
-    State getState();
-
-  private:
-    State m_state;
+    static void saveState(State state);
+    static State getState();
 };

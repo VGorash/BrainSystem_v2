@@ -3,7 +3,7 @@
 #include <arduino.h>
 
 
-BrainRingGame::BrainRingGame(bool isFalstartEnabled, Display& display) : JeopardyGame(isFalstartEnabled, display)
+BrainRingGame::BrainRingGame(bool isFalstartEnabled, bool isSoundEnabled, Display& display) : JeopardyGame(isFalstartEnabled, isSoundEnabled, display)
 {
 }
 

@@ -2,7 +2,7 @@
 
 #include <arduino.h>
 
-JeopardyGame::JeopardyGame(bool isFalstartEnabled, Display& display) : Game(isFalstartEnabled, display)
+JeopardyGame::JeopardyGame(bool isFalstartEnabled, bool isSoundEnabled, Display& display) : Game(isFalstartEnabled, isSoundEnabled, display)
 {
   m_gameTimer = new TimerMs(1000, 0, 0);
 }

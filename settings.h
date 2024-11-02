@@ -32,7 +32,7 @@
 // All times should be set as seconds | Все временные отрезки задаются в секундах
 // Jeopardy game | Своя Игра
 #define JEOPARDY_GAME_TIME 7 // Game time | Время игры
-#define JEOPARDY_TICKS_START 5 // Ticks start time | За сколько секунд до конца начать звуковые сигналы
+#define JEOPARDY_TICKS_START 0 // Ticks start time | За сколько секунд до конца начать звуковые сигналы
 
 // Brain Ring game | Брейн ринг
 #define BRAIN_GAME_TIME 60 // Game time | Время игры

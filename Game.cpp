@@ -4,7 +4,7 @@
 
 #define LED_BLINK_PERIOD 500
 
-Game::Game(bool isFalstartEnabled, Display& display) : m_isFalstartEnabled(isFalstartEnabled), m_display(display)
+Game::Game(bool isFalstartEnabled, bool isSoundEnabled, Display& display) : m_isFalstartEnabled(isFalstartEnabled), m_isSoundEnabled(isSoundEnabled), m_display(display)
 {
   m_blinkLedTimer = new TimerMs(LED_BLINK_PERIOD, 0, 0);
 }
@@ -83,13 +83,6 @@ void Game::blinkLed(int led)
   m_blinkLedTimer->start();
 }
 
-void Game::switchSound()
-{
-  m_isSoundEnabled = !m_isSoundEnabled;
-  playSound(4000, 100);
-  updateDisplayState();
-}
-
 void Game::playSound(int freq, int duration)
 {
   if(!m_isSoundEnabled)
@@ -126,22 +119,22 @@ static Game* Game::fromState(const State &state, Display& display)
   {
     case(1):
     {
-      game = new JeopardyGame(state.isFalstartEnabled, display);
+      game = new JeopardyGame(state.isFalstartEnabled, state.isSoundOn, display);
       break;
     }
     case(2):
     {
-      game = new BrainRingGame(state.isFalstartEnabled, display);
+      game = new BrainRingGame(state.isFalstartEnabled, state.isSoundOn, display);
       break;
     }
     case(3):
     {
-      game = new EightButtonsGame(state.isFalstartEnabled, display);
+      game = new EightButtonsGame(state.isFalstartEnabled, state.isSoundOn, display);
       break;
     }
     default:
     {
-      game = new Game(state.isFalstartEnabled, display);
+      game = new Game(state.isFalstartEnabled, state.isSoundOn, display);
     }
   }
   game->updateDisplayState();

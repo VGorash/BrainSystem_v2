@@ -18,7 +18,7 @@
 class Game : public Runnable
 { 
   public:
-    Game(bool isFalstartEnabled, Display& display);
+    Game(bool isFalstartEnabled, bool isSoundEnabled, Display& display);
     virtual ~Game();
 
     void tick() override;
@@ -28,16 +28,15 @@ class Game : public Runnable
     void onPlayerButtonPress(int player) override;
     void onUartDataReceive(byte data) override;
 
-    void switchSound() override;
-
     static Game* fromState(const State& state, Display& display);
+
+    const char* getName();
 
   
   public:
     const static int totalGames = 4;
 
   protected:
-    virtual const char* getName();
     virtual void cleanup();
     virtual void showTime();
     void updateDisplayState(bool timeOnly=false);
@@ -66,7 +65,7 @@ class Game : public Runnable
 class JeopardyGame : public Game
 {
   public:
-    JeopardyGame(bool isFalstartEnabled, Display& display);
+    JeopardyGame(bool isFalstartEnabled, bool isSoundEnabled, Display& display);
     ~JeopardyGame() override;
 
     void tick() override;
@@ -88,7 +87,7 @@ class JeopardyGame : public Game
 class BrainRingGame : public JeopardyGame
 {
   public:
-    BrainRingGame(bool isFalstartEnabled, Display& display);
+    BrainRingGame(bool isFalstartEnabled, bool isSoundEnabled, Display& display);
   
     void tick() override;
   
@@ -102,7 +101,7 @@ class BrainRingGame : public JeopardyGame
 class EightButtonsGame : public Game
 {
   public:
-    EightButtonsGame(bool isFalstartEnabled, Display& display);
+    EightButtonsGame(bool isFalstartEnabled, bool isSoundEnabled, Display& display);
 
     void onPlayerButtonPress(int player) override;
     void onStartButtonPress() override;
