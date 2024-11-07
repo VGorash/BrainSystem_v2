@@ -4,6 +4,7 @@
 
 #include "display.h"
 #include "settings.h"
+#include "sound.h"
 #include "Storage.h"
 #include "Runnable.h"
 
@@ -18,7 +19,7 @@
 class Game : public Runnable
 { 
   public:
-    Game(bool isFalstartEnabled, bool isSoundEnabled, Display& display);
+    Game(bool isFalstartEnabled, Display& display, SoundMode soundMode);
     virtual ~Game();
 
     void tick() override;
@@ -41,8 +42,8 @@ class Game : public Runnable
     virtual void showTime();
     void updateDisplayState(bool timeOnly=false);
     void blinkLed(int led);
-    void playSound(int freq, int duration);
     void sendUartData(byte command, byte payload=0x00);
+    void printPlayerTime();
 
   protected:
     bool m_isPlayerButtonBlocked = false;
@@ -58,6 +59,9 @@ class Game : public Runnable
     int m_currentPlayer = -1;
 
     Display& m_display;
+    Sound m_sound;
+
+    unsigned long m_startTime;
 
     const int leds[4] = {LED_PLAYER_1, LED_PLAYER_2, LED_PLAYER_3, LED_PLAYER_4};
 };
@@ -65,7 +69,7 @@ class Game : public Runnable
 class JeopardyGame : public Game
 {
   public:
-    JeopardyGame(bool isFalstartEnabled, bool isSoundEnabled, Display& display);
+    JeopardyGame(bool isFalstartEnabled, Display& display, SoundMode soundMode);
     ~JeopardyGame() override;
 
     void tick() override;
@@ -87,7 +91,7 @@ class JeopardyGame : public Game
 class BrainRingGame : public JeopardyGame
 {
   public:
-    BrainRingGame(bool isFalstartEnabled, bool isSoundEnabled, Display& display);
+    BrainRingGame(bool isFalstartEnabled, Display& display, SoundMode soundMode);
   
     void tick() override;
   
@@ -101,7 +105,7 @@ class BrainRingGame : public JeopardyGame
 class EightButtonsGame : public Game
 {
   public:
-    EightButtonsGame(bool isFalstartEnabled, bool isSoundEnabled, Display& display);
+    EightButtonsGame(bool isFalstartEnabled, Display& display, SoundMode soundMode);
 
     void onPlayerButtonPress(int player) override;
     void onStartButtonPress() override;

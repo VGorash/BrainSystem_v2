@@ -4,7 +4,7 @@ struct State
 {
   int gameNumber = 1;
   bool isFalstartEnabled = false;
-  bool isSoundOn = false;
+  int soundMode = 1;
 };
 
 class Storage

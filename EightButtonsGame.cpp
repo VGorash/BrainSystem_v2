@@ -1,7 +1,7 @@
 #include "Game.h"
 #include <Arduino.h>
 
-EightButtonsGame::EightButtonsGame(bool isFalstartEnabled, bool isSoundEnabled, Display& display) : Game(isFalstartEnabled, isSoundEnabled, display)
+EightButtonsGame::EightButtonsGame(bool isFalstartEnabled, Display& display, SoundMode soundMode) : Game(isFalstartEnabled, display, soundMode)
 {
 }
 

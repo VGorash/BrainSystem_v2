@@ -2,8 +2,13 @@
 
 #include <arduino.h>
 
+#define BRAIN_GAME_TIME 60
+#define BRAIN_WA_TIME 20
+#define BRAIN_TICKS_START 5
+#define BRAIN_PRE_END_TIME 10
 
-BrainRingGame::BrainRingGame(bool isFalstartEnabled, bool isSoundEnabled, Display& display) : JeopardyGame(isFalstartEnabled, isSoundEnabled, display)
+
+BrainRingGame::BrainRingGame(bool isFalstartEnabled, Display& display, SoundMode soundMode) : JeopardyGame(isFalstartEnabled, display, soundMode)
 {
 }
 
@@ -18,16 +23,16 @@ void BrainRingGame::tick()
     updateDisplayState(true);
     if(m_secondsLeft == BRAIN_PRE_END_TIME - 1)
     {
-      playSound(TONE_TICK, DURATION_END);
+      m_sound.pre_end();
     }
     if(m_secondsLeft <= BRAIN_TICKS_START && m_secondsLeft > 0)
     {
-      playSound(TONE_TICK, DURATION_TICK);
+      m_sound.tick();
     }
     else if (m_secondsLeft == 0)
     {
-      playSound(TONE_END, DURATION_END);
-      delay(DURATION_END);
+      m_sound.end();
+      delay(1000);
       cleanup();
     }
   }
@@ -50,7 +55,7 @@ void BrainRingGame::onStartButtonPress()
     cleanup();
     m_isStarted = true;
     digitalWrite(LED_SIGNAL, 1);
-    playSound(TONE_START, DURATION_START);
+    m_sound.start();
     sendUartData(UART_SLAVE_ENABLE_SIGNAL);
     m_secondsLeft = BRAIN_WA_TIME;
     updateDisplayState(true);
@@ -60,7 +65,7 @@ void BrainRingGame::onStartButtonPress()
   
   m_isStarted = true;
   digitalWrite(LED_SIGNAL, 1);
-  playSound(TONE_START, DURATION_START);
+  m_sound.start();
   sendUartData(UART_SLAVE_ENABLE_SIGNAL);
   m_secondsLeft = BRAIN_GAME_TIME;
   updateDisplayState(true);

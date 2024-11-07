@@ -2,7 +2,10 @@
 
 #include <arduino.h>
 
-JeopardyGame::JeopardyGame(bool isFalstartEnabled, bool isSoundEnabled, Display& display) : Game(isFalstartEnabled, isSoundEnabled, display)
+#define JEOPARDY_GAME_TIME 7 // Game time | Время игры
+#define JEOPARDY_TICKS_START 0 // Ticks start time | За сколько секунд до конца начать звуковые сигналы
+
+JeopardyGame::JeopardyGame(bool isFalstartEnabled, Display& display, SoundMode soundMode) : Game(isFalstartEnabled, display, soundMode)
 {
   m_gameTimer = new TimerMs(1000, 0, 0);
 }
@@ -23,12 +26,12 @@ void JeopardyGame::tick()
     updateDisplayState(true);
     if(m_secondsLeft <= JEOPARDY_TICKS_START && m_secondsLeft > 0)
     {
-      playSound(TONE_TICK, DURATION_TICK);
+      m_sound.tick();
     }
     else if (m_secondsLeft == 0)
     {
-      playSound(TONE_END, DURATION_END);
-      delay(DURATION_END);
+      m_sound.end();
+      delay(1000);
       cleanup();
     }
   }
@@ -57,19 +60,30 @@ void JeopardyGame::cleanup()
 void JeopardyGame::showTime(){
   if(m_isFalstart)
   {
+    m_display.setCursor(42, 3);
     m_display.print("ФС");
     return;
   }
+  if(m_currentPlayer > -1 && m_isFalstartEnabled){
+    m_display.setCursor(10, 3);
+    m_display.print("К");
+    m_display.print(m_currentPlayer + 1);
+    printPlayerTime();
+    return;
+  }
   if(m_currentPlayer > -1){
+    m_display.setCursor(42, 3);
     m_display.print("К");
     m_display.print(m_currentPlayer + 1);
     return;
   }
   if (m_secondsLeft < 0)
   {
+    m_display.setCursor(42, 3);
     m_display.print("--");
     return;
   }
+  m_display.setCursor(42, 3);
   if(m_secondsLeft < 10)
   {
     m_display.print(0);

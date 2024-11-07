@@ -11,7 +11,9 @@ SettingsWindow::SettingsWindow(State state, Display& display): m_display(display
 
   const char* onOffModes[2] = {"выкл", "вкл"};
   m_settings[1] = new SettingsItem(2, "Фальстарты", onOffModes, m_state, [](State& s, int v){s.isFalstartEnabled = (bool) v;}, m_state.isFalstartEnabled);
-  m_settings[2] = new SettingsItem(2, "Звук", onOffModes, m_state, [](State& s, int v){s.isSoundOn = (bool) v;}, m_state.isSoundOn);
+
+  const char* soundModes[3] = {"без звука", "обычный", "громко"};
+  m_settings[2] = new SettingsItem(3, "Тип звука", soundModes, m_state, [](State& s, int v){s.soundMode =  v;}, m_state.soundMode);
 
   updateDisplayState();
 }

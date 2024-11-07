@@ -2,7 +2,7 @@
 #include <EEPROM.h>
 
 #define INIT_ADDR 1023
-#define INIT_KEY 0
+#define INIT_KEY 1
 
 void Storage::saveState(State state)
 {
