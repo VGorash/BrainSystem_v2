@@ -4,7 +4,7 @@
 
 #define LED_BLINK_PERIOD 500
 
-Game::Game(bool isFalstartEnabled, bool isSoundEnabled, Display& display) : m_isFalstartEnabled(isFalstartEnabled), m_isSoundEnabled(isSoundEnabled), m_display(display)
+Game::Game(bool isFalstartEnabled, Display& display, SoundMode soundMode) : m_isFalstartEnabled(isFalstartEnabled), m_display(display), m_sound(soundMode) 
 {
   m_blinkLedTimer = new TimerMs(LED_BLINK_PERIOD, 0, 0);
 }
@@ -42,8 +42,10 @@ void Game::onPlayerButtonPress(int player)
       blinkLed(leds[player]);
     }
     sendUartData(UART_SLAVE_BLINK_LED, player);
-    playSound(TONE_FALSTART, DURATION_FALSTART);
+    m_sound.falstart();
     m_isFalstart = true;
+    updateDisplayState(true);
+    delay(500);
   }
   else
   {
@@ -54,9 +56,10 @@ void Game::onPlayerButtonPress(int player)
     }
     sendUartData(UART_SLAVE_ENABLE_LED, player);
     m_currentPlayer = player;
-    playSound(TONE_PRESS, DURATION_PRESS);
+    m_sound.press();
+    updateDisplayState(true);
+    delay(1000);
   } 
-  updateDisplayState(true);
 }
 
 void Game::onStopButtonPress()
@@ -73,7 +76,8 @@ void Game::onStartButtonPress()
   m_isStarted = true;
   digitalWrite(LED_SIGNAL, 1);
   sendUartData(UART_SLAVE_ENABLE_SIGNAL);
-  playSound(TONE_START, DURATION_START);
+  m_sound.start();
+  m_startTime = millis();
 }
 
 void Game::blinkLed(int led)
@@ -81,15 +85,6 @@ void Game::blinkLed(int led)
   m_blinkingLed = led;
   digitalWrite(led, 1);
   m_blinkLedTimer->start();
-}
-
-void Game::playSound(int freq, int duration)
-{
-  if(!m_isSoundEnabled)
-  {
-    return;
-  }
-  tone(BUZZER, freq, duration);
 }
 
 void Game::cleanup()
@@ -119,22 +114,22 @@ static Game* Game::fromState(const State &state, Display& display)
   {
     case(1):
     {
-      game = new JeopardyGame(state.isFalstartEnabled, state.isSoundOn, display);
+      game = new JeopardyGame(state.isFalstartEnabled, display, state.soundMode);
       break;
     }
     case(2):
     {
-      game = new BrainRingGame(state.isFalstartEnabled, state.isSoundOn, display);
+      game = new BrainRingGame(state.isFalstartEnabled, display, state.soundMode);
       break;
     }
     case(3):
     {
-      game = new EightButtonsGame(state.isFalstartEnabled, state.isSoundOn, display);
+      game = new EightButtonsGame(state.isFalstartEnabled, display, state.soundMode);
       break;
     }
     default:
     {
-      game = new Game(state.isFalstartEnabled, state.isSoundOn, display);
+      game = new Game(state.isFalstartEnabled, display, state.soundMode);
     }
   }
   game->updateDisplayState();
@@ -156,11 +151,18 @@ void Game::updateDisplayState(bool timeOnly)
     m_display.print(getName());
     m_display.setCursor(110, 0);
     m_display.print(m_isFalstartEnabled ? "Ф/С" : "Б/Ф");
-    m_display.setCursor(38, 7);
-    m_display.print(m_isSoundEnabled? "" : "без звука");
+    if (m_sound.getSoundMode() == SoundMode::Off) {
+      m_display.setCursor(38, 7);
+      m_display.print("без звука");
+    }
+    if (m_sound.getSoundMode() == SoundMode::Loud) {
+      m_display.setCursor(38, 7);
+      m_display.print("  громко");
+    }
   }
   m_display.setScale(4);
-  m_display.setCursor(42, 3);
+  m_display.setCursor(0, 3);
+  m_display.print("        ");
   showTime();
   m_display.update();
 }
@@ -168,15 +170,52 @@ void Game::updateDisplayState(bool timeOnly)
 void Game::showTime(){
   if(m_isFalstart)
   {
+    m_display.setCursor(42, 3);
     m_display.print("ФС");
     return;
   }
+  if(m_currentPlayer > -1 && m_isFalstartEnabled){
+    m_display.setCursor(10, 3);
+    m_display.print("К");
+    m_display.print(m_currentPlayer + 1);
+    printPlayerTime();
+    return;
+  }
   if(m_currentPlayer > -1){
+    m_display.setCursor(42, 3);
     m_display.print("К");
     m_display.print(m_currentPlayer + 1);
     return;
   }
+  m_display.setCursor(42, 3);
   m_display.print("--");
+}
+
+void Game::printPlayerTime()
+{
+  if (!m_isFalstartEnabled) {
+    return;
+  }
+  m_display.setScale(2);
+  m_display.print(" ");
+
+  int t = millis() - m_startTime - 120;
+  t = t > 0 ? t : 0;
+
+  char c[6];
+  sprintf(c, "%d", t / 1000);
+  m_display.print(c);
+  m_display.print(",");
+
+  if (t > 1000){
+    sprintf(c, "%d", (t % 1000) / 100);
+  }
+  else{
+    sprintf(c, "%03d", t % 1000);
+  }  
+  m_display.print(c);
+  
+  m_display.setScale(4);
 }
 
 void Game::sendUartData(byte command, byte payload)

@@ -6,6 +6,8 @@
 
 #include <EncButton.h>
 
+#define VERSION 1
+
 Button btnStart(BUTTON_START, BUTTONS_PIN_MODE);
 Button btnStop(BUTTON_STOP, BUTTONS_PIN_MODE);
 Button btnFunc(BUTTON_FUNC, BUTTONS_PIN_MODE);
@@ -34,9 +36,12 @@ void setup() {
   btnP3.attach([](){playerButtonCallback(&btnP3, 2);});
   btnP4.attach([](){playerButtonCallback(&btnP4, 3);});
 
-  showGreeting();
+  State state = Storage::getState();
+  Sound sound = Sound(state.soundMode);
 
-  window = Game::fromState(Storage::getState(), display);
+  showGreeting(sound);
+
+  window = Game::fromState(state, display);
 }
 
 void loop() {
@@ -62,28 +67,29 @@ void initPins() {
   pinMode(LED_SIGNAL, OUTPUT);
 }
 
-void showGreeting(){
+void showGreeting(Sound& sound){
   display.clear();
   display.setCursor(5, 2);
   display.setScale(2);
-  display.print("System 2.0");
+  display.print("System 2.");
+  display.print(VERSION);
   display.setCursor(64, 6);
   display.setScale(1);
   display.print("by VGorash");
   digitalWrite(LED_PLAYER_1, 1);
-  tone(BUZZER, 1000, 300);
+  sound.playTone(1000, 300);
   delay(500);
   digitalWrite(LED_PLAYER_1, 0);
   digitalWrite(LED_PLAYER_2, 1);
-  tone(BUZZER, 1500, 300);
+  sound.playTone(1500, 300);
   delay(500);
   digitalWrite(LED_PLAYER_2, 0);
   digitalWrite(LED_PLAYER_3, 1);
-  tone(BUZZER, 2000, 300);
+  sound.playTone(2000, 300);
   delay(500);
   digitalWrite(LED_PLAYER_3, 0);
   digitalWrite(LED_PLAYER_4, 1);
-  tone(BUZZER, 2500, 300);
+  sound.playTone(2500, 300);
   delay(500);
   digitalWrite(LED_PLAYER_4, 0);
 }
