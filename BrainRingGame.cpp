@@ -23,7 +23,7 @@ void BrainRingGame::tick()
     updateDisplayState(true);
     if(m_secondsLeft == BRAIN_PRE_END_TIME - 1)
     {
-      m_sound.end();
+      m_sound.tick();
     }
     if(m_secondsLeft <= BRAIN_TICKS_START && m_secondsLeft > 0)
     {
