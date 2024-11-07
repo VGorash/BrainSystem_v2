@@ -46,6 +46,10 @@ public:
     play(NORMAL_TONE_TICK, LOUD_TONE_TICK, SOUND_DURATION_TICK);
   };
 
+   void pre_end() {
+    play(NORMAL_TONE_TICK, LOUD_TONE_TICK, SOUND_DURATION_END);
+  };
+
   void end() {
     play(NORMAL_TONE_END, LOUD_TONE_END, SOUND_DURATION_END);
   };
