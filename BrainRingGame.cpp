@@ -60,6 +60,7 @@ void BrainRingGame::onStartButtonPress()
     m_secondsLeft = BRAIN_WA_TIME;
     updateDisplayState(true);
     m_gameTimer->start();
+    m_startTime = millis();
     return;
   }
   
@@ -70,6 +71,7 @@ void BrainRingGame::onStartButtonPress()
   m_secondsLeft = BRAIN_GAME_TIME;
   updateDisplayState(true);
   m_gameTimer->start();
+  m_startTime = millis();
 }
 
 const char* BrainRingGame::getName()
