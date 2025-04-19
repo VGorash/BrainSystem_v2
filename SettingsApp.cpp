@@ -4,8 +4,7 @@
 #include "src/Framework/Game.h"
 #include "src/Framework/JeopardyGame.h"
 #include "src/Framework/BrainRingGame.h"
-
-#include "UartLink.h"
+#include "EightButtonsApp.h"
 
 using namespace vgs;
 
@@ -30,11 +29,17 @@ App* createBrainRingGame(bool falstartEnabled)
   return new BrainRingGame(falstartEnabled);
 }
 
-constexpr int gameCount = 3;
+App* createEightButtonsApp(bool falstartEnabled)
+{
+  return new EightButtonsApp();
+}
+
+constexpr int gameCount = 4;
 constexpr GameInfo games[gameCount] = {
   {"Без отсчета", createGame},
   {"Своя игра", createJeopardyGame},
-  {"Брейн-ринг", createBrainRingGame}
+  {"Брейн-ринг", createBrainRingGame},
+  {"8 кнопок", createEightButtonsApp}
 };
 
 SettingsApp::SettingsApp(bool launchGame) : m_launchGame(launchGame)
@@ -53,8 +58,8 @@ SettingsApp::SettingsApp(bool launchGame) : m_launchGame(launchGame)
   m_settings.addItem("Звук", 2, onOffNames);
   m_settings.addItem("Свет", 2, onOffNames);
 
-  const char* linkModes[2] = {"V1 (совместимость)", "V2 (обычный)"};
-  m_settings.addItem("Режим связи", 2, linkModes);
+  const char* linkModes[2] = {"V1 (устаревший)", "V2 (обычный)"};
+  m_settings.addItem("Link", 2, linkModes);
 }
 
 void SettingsApp::init(Hal* hal)

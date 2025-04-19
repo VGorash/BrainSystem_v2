@@ -137,6 +137,11 @@ ButtonState HalImpl::getButtonState()
 
 void HalImpl::playerLedOn(int player)
 {
+  playerLedOn(player, true);
+}
+
+void HalImpl::playerLedOn(int player, bool useLink)
+{
   if (player < 0)
   {
     return;
@@ -145,7 +150,7 @@ void HalImpl::playerLedOn(int player)
   if(player < NUM_PLAYERS)
   {
     digitalWrite(playerLedPins[player], 1);
-    m_link->send(link::Command::DisplayPlayerLedOn, player);
+    sendLinkCommand(useLink, link::Command::DisplayPlayerLedOn, player);
     return;
   }
 
@@ -153,11 +158,16 @@ void HalImpl::playerLedOn(int player)
 
   if(player < UART_LINK_MAX_PLAYERS)
   {
-    m_link->send(link::Command::PlayerLedOn, player);
+    sendLinkCommand(useLink, link::Command::PlayerLedOn, player);
   }
 }
 
 void HalImpl::playerLedBlink(int player)
+{
+  playerLedBlink(player, true);
+}
+
+void HalImpl::playerLedBlink(int player, bool useLink)
 {
   if (player < 0)
   {
@@ -169,7 +179,7 @@ void HalImpl::playerLedBlink(int player)
     digitalWrite(playerLedPins[player], 1);
     m_blinkingLeds[player] = true;
 
-    m_link->send(link::Command::DisplayPlayerLedBlink, player);
+    sendLinkCommand(useLink, link::Command::DisplayPlayerLedBlink, player);
 
     if(!m_blinkTimer.isStarted())
     {
@@ -184,21 +194,31 @@ void HalImpl::playerLedBlink(int player)
 
   if(player < UART_LINK_MAX_PLAYERS)
   {
-    m_link->send(link::Command::PlayerLedBlink, player);
+    sendLinkCommand(useLink, link::Command::PlayerLedBlink, player);
   }
 }
 
 void HalImpl::signalLedOn()
+{
+  signalLedOn(true);
+}
+
+void HalImpl::signalLedOn(bool useLink)
 {
   if(m_signalLightEnabled)
   {
     digitalWrite(LED_SIGNAL, 1);
   }
 
-  m_link->send(link::Command::SignalLedOn);
+  sendLinkCommand(useLink, link::Command::SignalLedOn);
 }
 
 void HalImpl::ledsOff()
+{
+  ledsOff(true);
+}
+
+void HalImpl::ledsOff(bool useLink)
 {
   digitalWrite(LED_SIGNAL, 0);
 
@@ -210,7 +230,7 @@ void HalImpl::ledsOff()
 
   m_blinkTimer.stop();
 
-  m_link->send(link::Command::LedsOff);
+  sendLinkCommand(useLink, link::Command::LedsOff);
 }
 
 void HalImpl::setSignalLightEnabled(bool enabled)
@@ -377,7 +397,21 @@ void HalImpl::updateDisplay(const GameDisplayInfo& info)
 
 void HalImpl::updateDisplay(const CustomDisplayInfo& info)
 {
-  
+  if(String(info.name) != String("eight_buttons"))
+  {
+    return;
+  }
+  m_state.display_mode = DisplayMode::EightButtons;
+
+  m_display.clear();
+  m_display.setScale(2);
+  m_display.setCursor(16, 1);
+  m_display.print("8 КНОПОК");
+  m_display.setScale(1);
+  m_display.setCursor(6, 4);
+  m_display.print("управляйте с другой");
+  m_display.setCursor(35, 6);
+  m_display.print("системы");
 }
 
 void HalImpl::updateDisplay(const SettingsDisplayInfo& info)
@@ -434,4 +468,19 @@ void HalImpl::setLinkVersion(link::UartLinkVersion version)
     delete m_link;
     m_link = new link::ArduinoUartLink(&Serial, version);
   }
+}
+
+void HalImpl::sendLinkCommand(bool useLink, link::Command command, unsigned int data)
+{
+  if(!useLink)
+  {
+    return;
+  }
+
+  m_link->send(command, data);
+}
+
+link::Link* HalImpl::getLink()
+{
+  return m_link;
 }

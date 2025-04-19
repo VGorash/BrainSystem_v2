@@ -22,7 +22,8 @@ enum class HalSoundMode
 enum class DisplayMode
 {
   Game,
-  Settings
+  Settings, 
+  EightButtons
 };
 
 struct HalState
@@ -44,9 +45,13 @@ public:
 
   //leds
   void playerLedOn(int player) override;
+  void playerLedOn(int player, bool useLink);
   void playerLedBlink(int player) override;
+  void playerLedBlink(int player, bool useLink);
   void signalLedOn() override;
+  void signalLedOn(bool useLink);
   void ledsOff() override;
+  void ledsOff(bool useLink);
   void setSignalLightEnabled(bool enabled);
 
   //sound
@@ -58,8 +63,6 @@ public:
   void updateDisplay(const vgs::GameDisplayInfo& info) override;
   void updateDisplay(const vgs::SettingsDisplayInfo& info) override;
   void updateDisplay(const vgs::CustomDisplayInfo& info) override;
-  void showTime(const vgs::GameDisplayInfo& info);
-  void showPressTime(const vgs::GameDisplayInfo& info);
 
   //time
   unsigned long getTimeMillis() override;
@@ -70,6 +73,13 @@ public:
 
   // link
   void setLinkVersion(vgs::link::UartLinkVersion);
+  vgs::link::Link* getLink();
+
+private:
+  void showTime(const vgs::GameDisplayInfo& info);
+  void showPressTime(const vgs::GameDisplayInfo& info);
+
+  void sendLinkCommand(bool useLink, vgs::link::Command command, unsigned int data = 0);
 
 private:  
   Button m_playerButtons[NUM_PLAYERS];
