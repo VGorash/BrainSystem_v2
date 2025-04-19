@@ -42,11 +42,13 @@ HalImpl::HalImpl()
 {
   m_blinkTimer.setTime(500);
   m_blinkTimer.setPeriodMode(true);
+
+  m_link = new link::ArduinoUartLink(&Serial);
 }
 
 HalImpl::~HalImpl()
 {
-
+  delete m_link;
 }
 
 void HalImpl::init()
@@ -57,6 +59,7 @@ void HalImpl::init()
   for(int i=0; i<NUM_PLAYERS; i++)
   {
     m_playerButtons[i].init(playerButtonPins[i], INPUT);
+    m_playerButtons[i].setDebTimeout(10);
     pinMode(playerLedPins[i], OUTPUT);
   }
 
@@ -90,6 +93,8 @@ void HalImpl::tick()
   {
     m_playerButtons[i].tick();
   }
+
+  m_link->tick();
 }
 
 ButtonState HalImpl::getButtonState()
@@ -103,6 +108,11 @@ ButtonState HalImpl::getButtonState()
       s.player = i;
       break;
     }
+  }
+
+  if(s.player < 0 && m_link->getCommand() == link::Command::PlayerButton)
+  {
+    s.player = m_link->getData() + NUM_PLAYERS;
   }
 
   if(m_startButton.press())
@@ -131,10 +141,19 @@ void HalImpl::playerLedOn(int player)
   {
     return;
   }
-  if(player < 4)
+
+  if(player < NUM_PLAYERS)
   {
     digitalWrite(playerLedPins[player], 1);
+    m_link->send(link::Command::DisplayPlayerLedOn, player);
     return;
+  }
+
+  player -= NUM_PLAYERS;
+
+  if(player < UART_LINK_MAX_PLAYERS)
+  {
+    m_link->send(link::Command::PlayerLedOn, player);
   }
 }
 
@@ -144,10 +163,13 @@ void HalImpl::playerLedBlink(int player)
   {
     return;
   }
-  if(player < 4)
+
+  if(player < NUM_PLAYERS)
   {
-    playerLedOn(player);
+    digitalWrite(playerLedPins[player], 1);
     m_blinkingLeds[player] = true;
+
+    m_link->send(link::Command::DisplayPlayerLedBlink, player);
 
     if(!m_blinkTimer.isStarted())
     {
@@ -157,6 +179,13 @@ void HalImpl::playerLedBlink(int player)
 
     return;
   }
+
+  player -= NUM_PLAYERS;
+
+  if(player < UART_LINK_MAX_PLAYERS)
+  {
+    m_link->send(link::Command::PlayerLedBlink, player);
+  }
 }
 
 void HalImpl::signalLedOn()
@@ -165,6 +194,8 @@ void HalImpl::signalLedOn()
   {
     digitalWrite(LED_SIGNAL, 1);
   }
+
+  m_link->send(link::Command::SignalLedOn);
 }
 
 void HalImpl::ledsOff()
@@ -178,6 +209,8 @@ void HalImpl::ledsOff()
   }
 
   m_blinkTimer.stop();
+
+  m_link->send(link::Command::LedsOff);
 }
 
 void HalImpl::setSignalLightEnabled(bool enabled)
@@ -229,15 +262,21 @@ void HalImpl::setSoundMode(HalSoundMode mode)
   m_soundMode = mode;
 }
 
+bool pressTimeEnabled(const vgs::GameDisplayInfo& info)
+{
+  return info.pressTime >= 0 && info.falstart_enabled;
+}
+
 void HalImpl::showTime(const vgs::GameDisplayInfo& info)
 {
   switch(info.state)
   {
     case GameState::Press:
     {
-      m_display.setCursor(42, 3);
+      m_display.setCursor(pressTimeEnabled(info) ? 10 : 42, 3);
       m_display.print("К");
       m_display.print(info.player + 1);
+      showPressTime(info);
     }
     break;
 
@@ -277,10 +316,10 @@ void HalImpl::showTime(const vgs::GameDisplayInfo& info)
   }
 }
 
-/*
-void HalImpl::showPlayerTime(const vgs::GameDisplayInfo& info)
+
+void HalImpl::showPressTime(const vgs::GameDisplayInfo& info)
 {
-  if (!m_isFalstartEnabled)
+  if (!pressTimeEnabled(info))
   {
     return;
   }
@@ -288,8 +327,7 @@ void HalImpl::showPlayerTime(const vgs::GameDisplayInfo& info)
   m_display.setScale(2);
   m_display.print(" ");
 
-  int t = millis() - m_startTime - 120;
-  t = t > 0 ? t : 0;
+  int t = info.pressTime;
 
   char c[6];
   sprintf(c, "%d", t / 1000);
@@ -300,14 +338,13 @@ void HalImpl::showPlayerTime(const vgs::GameDisplayInfo& info)
     sprintf(c, "%d", (t % 1000) / 100);
   }
   else{
-    sprintf(c, "%03d", t % 1000);
+    sprintf(c, "%02d", (t % 1000) / 10);
   }  
 
   m_display.print(c);
-  m_display.setScale(4);
+  m_display.print("c");
 }
 
-*/
 
 void HalImpl::updateDisplay(const GameDisplayInfo& info)
 {
@@ -388,4 +425,13 @@ void HalImpl::loadSettings(Settings& settings)
   }
 
   settings.loadData(data);
+}
+
+void HalImpl::setLinkVersion(link::UartLinkVersion version)
+{
+  if(m_link->getVersion() != version)
+  {
+    delete m_link;
+    m_link = new link::ArduinoUartLink(&Serial, version);
+  }
 }

@@ -5,6 +5,8 @@
 #include "src/Framework/JeopardyGame.h"
 #include "src/Framework/BrainRingGame.h"
 
+#include "UartLink.h"
+
 using namespace vgs;
 
 struct GameInfo
@@ -50,6 +52,9 @@ SettingsApp::SettingsApp(bool launchGame) : m_launchGame(launchGame)
   const char* onOffNames[2] = {"Включен", "Выключен"};
   m_settings.addItem("Звук", 2, onOffNames);
   m_settings.addItem("Свет", 2, onOffNames);
+
+  const char* linkModes[2] = {"V1 (совместимость)", "V2 (обычный)"};
+  m_settings.addItem("Режим связи", 2, linkModes);
 }
 
 void SettingsApp::init(Hal* hal)
@@ -126,9 +131,11 @@ void SettingsApp::exit(Hal* hal)
   m_settings.dumpData(settingsState);
   int soundMode = settingsState[2];
   bool signalLightDisabled = settingsState[3];
+  int linkVersion = settingsState[4];
 
   halImpl->setSoundMode(static_cast<HalSoundMode>(soundMode));
   halImpl->setSignalLightEnabled(!signalLightDisabled);
+  halImpl->setLinkVersion(static_cast<vgs::link::UartLinkVersion>(linkVersion));
 
   m_shouldClose = true;
 }

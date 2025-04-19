@@ -1,12 +1,15 @@
 #ifndef HAL_IMPL_H
 #define HAL_IMPL_H
 
+#define USE_ARDUINO_UART_LINK
+
 #include <EncButton.h>
 
 #include "src/Framework/Core/Hal.h"
 #include "src/Framework/Timer.h"
 
 #include "Display.h"
+#include "ArduinoUartLink.h"
 
 #define NUM_PLAYERS 4
 
@@ -56,7 +59,7 @@ public:
   void updateDisplay(const vgs::SettingsDisplayInfo& info) override;
   void updateDisplay(const vgs::CustomDisplayInfo& info) override;
   void showTime(const vgs::GameDisplayInfo& info);
-  //void showPlayerTime(const vgs::GameDisplayInfo& info);
+  void showPressTime(const vgs::GameDisplayInfo& info);
 
   //time
   unsigned long getTimeMillis() override;
@@ -64,6 +67,9 @@ public:
   //settings
   void saveSettings(const vgs::Settings& settings) override;
   void loadSettings(vgs::Settings& settings) override;
+
+  // link
+  void setLinkVersion(vgs::link::UartLinkVersion);
 
 private:  
   Button m_playerButtons[NUM_PLAYERS];
@@ -74,6 +80,8 @@ private:
   vgs::Timer m_blinkTimer;
   bool m_blinkState = 0;
   bool m_blinkingLeds[NUM_PLAYERS];
+
+  vgs::link::UartLink* m_link;
 
   HalSoundMode m_soundMode;
   bool m_signalLightEnabled = true;
