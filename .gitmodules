@@ -1,3 +1,6 @@
 [submodule "src/Framework"]
 	path = src/Framework
 	url = git@github.com:VGorash/BrainSystem_Framework.git
+[submodule "src/Link"]
+	path = src/Link
+	url = git@github.com:VGorash/BrainSystem_Link.git

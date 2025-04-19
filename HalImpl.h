@@ -7,9 +7,10 @@
 
 #include "src/Framework/Core/Hal.h"
 #include "src/Framework/Timer.h"
+#include "src/Link/ArduinoUartLink.h"
 
 #include "Display.h"
-#include "ArduinoUartLink.h"
+
 
 #define NUM_PLAYERS 4
 
