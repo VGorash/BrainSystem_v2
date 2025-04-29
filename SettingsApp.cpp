@@ -10,7 +10,6 @@ using namespace vgs;
 
 struct GameInfo
 {
-  const char* name;
   App* (*constructor)(const GameConfig&);
 };
 
@@ -34,32 +33,23 @@ App* createEightButtonsApp(const GameConfig& config)
   return new EightButtonsApp();
 }
 
+typedef App* (*GameConstructor)(const GameConfig&);
+
 constexpr int gameCount = 4;
-constexpr GameInfo games[gameCount] = {
-  {"Без отсчета", createGame},
-  {"Своя игра", createJeopardyGame},
-  {"Брейн-ринг", createBrainRingGame},
-  {"8 кнопок", createEightButtonsApp}
-};
+constexpr GameConstructor gameConstructors[gameCount] = {createGame, createJeopardyGame, createBrainRingGame, createEightButtonsApp};
+
+constexpr const char* gameNames[gameCount] = {"Без отсчета", "Своя игра", "Брейн-ринг", "8 кнопок"};
+constexpr const char* modeNames[2] = {"Без фальстартов", "С фальстартами"};
+constexpr const char* onOffNames[2] = {"Включен", "Выключен"};
+constexpr const char* linkModes[2] = {"V1 (устаревший)", "V2 (обычный)"};
 
 SettingsApp::SettingsApp(bool launchGame) : m_launchGame(launchGame)
 {
-  const char* gameNames[gameCount];
-  for(int i=0; i<gameCount; i++)
-  {
-    gameNames[i] = games[i].name;
-  }
-  m_settings.addItem("Тип игры", gameCount, gameNames);
-
-  const char* modeNames[2] = {"Без фальстартов", "С фальстартами"};
-  m_settings.addItem("Режим", 2, modeNames);
-
-  const char* onOffNames[2] = {"Включен", "Выключен"};
-  m_settings.addItem("Звук", 2, onOffNames);
-  m_settings.addItem("Свет", 2, onOffNames);
-
-  const char* linkModes[2] = {"V1 (устаревший)", "V2 (обычный)"};
-  m_settings.addItem("Link", 2, linkModes);
+  m_settings.addItem(new ListSettingsItem("Тип игры", gameCount, gameNames));  
+  m_settings.addItem(new ListSettingsItem("Режим", 2, modeNames));
+  m_settings.addItem(new ListSettingsItem("Звук", 2, onOffNames));
+  m_settings.addItem(new ListSettingsItem("Свет", 2, onOffNames));
+  m_settings.addItem(new ListSettingsItem("Link", 2, linkModes));
 }
 
 void SettingsApp::init(Hal* hal)
@@ -168,5 +158,5 @@ App* SettingsApp::getCustomApp()
   GameConfig config;
   config.falstartEnabled = (bool) settingsState[1];
 
-  return games[gameNumber].constructor(config);
+  return gameConstructors[gameNumber](config);
 }
