@@ -11,25 +11,25 @@ using namespace vgs;
 struct GameInfo
 {
   const char* name;
-  App* (*constructor)(bool);
+  App* (*constructor)(const GameConfig&);
 };
 
-App* createGame(bool falstartEnabled)
+App* createGame(const GameConfig& config)
 {
-  return new Game(falstartEnabled);
+  return new Game(config);
 }
 
-App* createJeopardyGame(bool falstartEnabled)
+App* createJeopardyGame(const GameConfig& config)
 {
-  return new JeopardyGame(falstartEnabled);
+  return new JeopardyGame(config);
 }
 
-App* createBrainRingGame(bool falstartEnabled)
+App* createBrainRingGame(const GameConfig& config)
 {
-  return new BrainRingGame(falstartEnabled);
+  return new BrainRingGame(config);
 }
 
-App* createEightButtonsApp(bool falstartEnabled)
+App* createEightButtonsApp(const GameConfig& config)
 {
   return new EightButtonsApp();
 }
@@ -164,7 +164,9 @@ App* SettingsApp::getCustomApp()
 
   int gameNumber = settingsState[0];
   bool falstartEnabled = (bool) settingsState[1];
-  int soundEnabled = settingsState[2];
+  
+  GameConfig config;
+  config.falstartEnabled = (bool) settingsState[1];
 
-  return games[gameNumber].constructor(falstartEnabled);
+  return games[gameNumber].constructor(config);
 }
