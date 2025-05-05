@@ -429,7 +429,7 @@ void HalImpl::updateDisplay(const SettingsDisplayInfo& info)
 
   m_display.setScale(1);
   m_display.setCursor(0, 6);
-  m_display.print(info.settings->getCurrentItem()->getValue());
+  m_display.print(info.settings->getCurrentItem()->getValueStr());
   m_display.update();
 }
 
@@ -438,7 +438,7 @@ unsigned long HalImpl::getTimeMillis()
   return millis();
 }
 
-void HalImpl::saveSettings(const Settings& settings)
+void HalImpl::saveSettings(const ISettings& settings)
 {
   int data[settings.size()];
   settings.dumpData(data);
@@ -449,7 +449,7 @@ void HalImpl::saveSettings(const Settings& settings)
   }
 }
 
-void HalImpl::loadSettings(Settings& settings)
+void HalImpl::loadSettings(ISettings& settings)
 {
   int data[settings.size()];
 

@@ -92,7 +92,7 @@ void SettingsApp::process(Hal* hal)
   }
   if(buttonState.enter)
   {
-    m_settings.next();
+    m_settings.moveNext();
     m_displayDirty = true;
     return;
   }

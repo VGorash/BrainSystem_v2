@@ -69,8 +69,8 @@ public:
   unsigned long getTimeMillis() override;
 
   //settings
-  void saveSettings(const vgs::Settings& settings) override;
-  void loadSettings(vgs::Settings& settings) override;
+  void saveSettings(const vgs::ISettings& settings) override;
+  void loadSettings(vgs::ISettings& settings) override;
 
   // link
   void setLinkVersion(vgs::link::UartLinkVersion);
