@@ -38,7 +38,7 @@ typedef IApp* (*GameConstructor)(const GameConfig&);
 constexpr int gameCount = 4;
 constexpr GameConstructor gameConstructors[gameCount] = {createGame, createJeopardyGame, createBrainRingGame, createEightButtonsApp};
 
-constexpr const char* gameNames[gameCount] = {"Без отсчета", "Своя игра", "Брейн-ринг", "8 кнопок"};
+constexpr const char* gameNames[gameCount] = {"БЕЗ ОТСЧЕТА", "СВОЯ ИГРА", "БРЕЙН-РИНГ", "8 КНОПОК"};
 constexpr const char* modeNames[2] = {"Без фальстартов", "С фальстартами"};
 constexpr const char* onOffNames[2] = {"Включен", "Выключен"};
 constexpr const char* linkModes[2] = {"V1 (устаревший)", "V2 (обычный)"};
@@ -153,10 +153,10 @@ IApp* SettingsApp::createCustomApp()
   m_settings.dumpData(settingsState);
 
   int gameNumber = settingsState[0];
-  bool falstartEnabled = (bool) settingsState[1];
   
   GameConfig config;
-  config.falstartEnabled = (bool) settingsState[1];
+  config.displayed_name = gameNames[gameNumber];
+  config.mode = static_cast<GameMode>(settingsState[1]);
 
   return gameConstructors[gameNumber](config);
 }

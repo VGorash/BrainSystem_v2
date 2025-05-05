@@ -35,8 +35,8 @@
 
 using namespace vgs;
 
-static const int playerButtonPins[NUM_PLAYERS] = {BUTTON_PLAYER_1, BUTTON_PLAYER_2, BUTTON_PLAYER_3, BUTTON_PLAYER_4};
-static const int playerLedPins[NUM_PLAYERS] = {LED_PLAYER_1, LED_PLAYER_2, LED_PLAYER_3, LED_PLAYER_4};
+constexpr int playerButtonPins[NUM_PLAYERS] = {BUTTON_PLAYER_1, BUTTON_PLAYER_2, BUTTON_PLAYER_3, BUTTON_PLAYER_4};
+constexpr int playerLedPins[NUM_PLAYERS] = {LED_PLAYER_1, LED_PLAYER_2, LED_PLAYER_3, LED_PLAYER_4};
 
 HalImpl::HalImpl()
 {
@@ -287,7 +287,7 @@ void HalImpl::setSoundMode(HalSoundMode mode)
 
 bool pressTimeEnabled(const vgs::GameDisplayInfo& info)
 {
-  return info.pressTime >= 0 && info.falstart_enabled;
+  return info.pressTime >= 0 && info.mode == GameMode::Falstart;
 }
 
 void HalImpl::showTime(const vgs::GameDisplayInfo& info)
@@ -376,12 +376,14 @@ void HalImpl::updateDisplay(const GameDisplayInfo& info)
 
   if(m_displayForceUpdate)
   {
+    constexpr const char* modeNames[2] = {"Б/Ф", "Ф/С"};
+
     m_display.clear();
     m_display.setScale(1);
     m_display.home();
     m_display.print(info.name);
     m_display.setCursor(110, 0);
-    m_display.print(info.falstart_enabled ? "Ф/С" : "Б/Ф");
+    m_display.print(modeNames[static_cast<int>(info.mode)]);
 
     if (m_soundMode == HalSoundMode::Disabled) {
       m_display.setCursor(38, 7);
