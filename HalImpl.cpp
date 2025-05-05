@@ -53,6 +53,9 @@ HalImpl::~HalImpl()
 
 void HalImpl::init()
 {
+  Serial.begin(9600);
+  Wire.setClock(800000L);
+  
   m_display.init();
   m_display.textMode(BUF_REPLACE);
 
@@ -72,7 +75,7 @@ void HalImpl::init()
 
 void HalImpl::tick()
 {
-  if(m_blinkTimer.tick(this))
+  if(m_blinkTimer.tick(*this))
   {
     m_blinkState = !m_blinkState;
 
@@ -184,7 +187,7 @@ void HalImpl::playerLedBlink(int player, bool useLink)
     if(!m_blinkTimer.isStarted())
     {
       m_blinkState = 1;
-      m_blinkTimer.start(this);
+      m_blinkTimer.start(*this);
     }
 
     return;
@@ -425,11 +428,11 @@ void HalImpl::updateDisplay(const SettingsDisplayInfo& info)
 
   m_display.setScale(2);
   m_display.setCursor(0, 3);
-  m_display.print(info.settings->getCurrentItem()->getName());
+  m_display.print(info.settings->getCurrentItem().getName());
 
   m_display.setScale(1);
   m_display.setCursor(0, 6);
-  m_display.print(info.settings->getCurrentItem()->getValueStr());
+  m_display.print(info.settings->getCurrentItem().getValueStr());
   m_display.update();
 }
 

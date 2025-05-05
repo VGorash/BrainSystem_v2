@@ -8,16 +8,16 @@ EightButtonsApp::EightButtonsApp()
 
 }
 
-void EightButtonsApp::init(Hal* hal)
+void EightButtonsApp::init(IHal& hal)
 {
   CustomDisplayInfo info;
   info.name = "eight_buttons";
-  hal->updateDisplay(info);
+  hal.updateDisplay(info);
 }
 
-void EightButtonsApp::tick(Hal* hal)
+void EightButtonsApp::tick(IHal& hal)
 {
-  HalImpl* halImpl = (HalImpl*) hal;
+  HalImpl* halImpl = (HalImpl*) &hal;
   link::Link* linkHandle = halImpl->getLink();
   ButtonState buttonState = halImpl->getButtonState();
 
@@ -70,7 +70,7 @@ AppChangeType EightButtonsApp::appChangeNeeded()
   return AppChangeType::None;
 }
 
-App* EightButtonsApp::getCustomApp()
+IApp* EightButtonsApp::createCustomApp()
 {
   return nullptr;
 }

@@ -6,20 +6,19 @@
 namespace vgs
 {
 
-class EightButtonsApp : public App
+class EightButtonsApp : public IApp
 {
 public:
   EightButtonsApp();
 
-  void init(Hal* hal) override;
-  void tick(Hal* hal) override;
+  void init(IHal& hal) override;
+  void tick(IHal& hal) override;
 
   AppChangeType appChangeNeeded() override;
-  App* getCustomApp() override;
+  IApp* createCustomApp() override;
 
 private:
   bool m_shouldClose = false;
-  
 };
 
 } // namespace vgs

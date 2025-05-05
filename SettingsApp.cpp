@@ -10,30 +10,30 @@ using namespace vgs;
 
 struct GameInfo
 {
-  App* (*constructor)(const GameConfig&);
+  IApp* (*constructor)(const GameConfig&);
 };
 
-App* createGame(const GameConfig& config)
+IApp* createGame(const GameConfig& config)
 {
   return new Game(config);
 }
 
-App* createJeopardyGame(const GameConfig& config)
+IApp* createJeopardyGame(const GameConfig& config)
 {
   return new JeopardyGame(config);
 }
 
-App* createBrainRingGame(const GameConfig& config)
+IApp* createBrainRingGame(const GameConfig& config)
 {
   return new BrainRingGame(config);
 }
 
-App* createEightButtonsApp(const GameConfig& config)
+IApp* createEightButtonsApp(const GameConfig& config)
 {
   return new EightButtonsApp();
 }
 
-typedef App* (*GameConstructor)(const GameConfig&);
+typedef IApp* (*GameConstructor)(const GameConfig&);
 
 constexpr int gameCount = 4;
 constexpr GameConstructor gameConstructors[gameCount] = {createGame, createJeopardyGame, createBrainRingGame, createEightButtonsApp};
@@ -52,9 +52,9 @@ SettingsApp::SettingsApp(bool launchGame) : m_launchGame(launchGame)
   m_settings.addItem(new ListSettingsItem("Link", 2, linkModes));
 }
 
-void SettingsApp::init(Hal* hal)
+void SettingsApp::init(IHal& hal)
 {
-  hal->loadSettings(m_settings);
+  hal.loadSettings(m_settings);
 
   if(m_launchGame)
   {
@@ -63,7 +63,7 @@ void SettingsApp::init(Hal* hal)
   }
 }
 
-void SettingsApp::tick(Hal* hal)
+void SettingsApp::tick(IHal& hal)
 {
   if(m_shouldClose)
   {
@@ -76,14 +76,14 @@ void SettingsApp::tick(Hal* hal)
   {
     SettingsDisplayInfo info;
     info.settings = &m_settings;
-    hal->updateDisplay(info);
+    hal.updateDisplay(info);
     m_displayDirty = false;
   }
 }
 
-void SettingsApp::process(Hal* hal)
+void SettingsApp::process(IHal& hal)
 {
-  ButtonState buttonState = hal->getButtonState();
+  ButtonState buttonState = hal.getButtonState();
 
   if(buttonState.menu)
   {
@@ -98,23 +98,23 @@ void SettingsApp::process(Hal* hal)
   }
   if(buttonState.start)
   {
-    m_settings.getCurrentItem()->increment();
+    m_settings.getCurrentItem().increment();
     m_displayDirty = true;
     m_settingsDirty = true;
     return;
   }
   if(buttonState.stop)
   {
-    m_settings.getCurrentItem()->decrement();
+    m_settings.getCurrentItem().decrement();
     m_displayDirty = true;
     m_settingsDirty = true;
     return;
   }
 }
 
-void SettingsApp::exit(Hal* hal)
+void SettingsApp::exit(IHal& hal)
 {
-  HalImpl* halImpl = (HalImpl*) hal;
+  HalImpl* halImpl = (HalImpl*) &hal;
 
   if(m_settingsDirty)
   {
@@ -147,7 +147,7 @@ AppChangeType SettingsApp::appChangeNeeded()
   return AppChangeType::None;
 }
 
-App* SettingsApp::getCustomApp()
+IApp* SettingsApp::createCustomApp()
 {
   int settingsState[m_settings.size()];
   m_settings.dumpData(settingsState);

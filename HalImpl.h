@@ -32,13 +32,13 @@ struct HalState
   DisplayMode display_mode;
 };
 
-class HalImpl : public vgs::Hal
+class HalImpl : public vgs::IHal
 {
 public:
   HalImpl();
   ~HalImpl();
 
-  void init();
+  void init() override;
   void tick() override;
 
   //buttons

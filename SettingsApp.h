@@ -7,21 +7,20 @@
 namespace vgs
 {
 
-class SettingsApp : public App
+class SettingsApp : public IApp
 {
 public:
   SettingsApp(bool launchGame);
 
-  void init(Hal* hal) override;
-  void tick(Hal* hal) override;
+  void init(IHal& hal) override;
+  void tick(IHal& hal) override;
 
   AppChangeType appChangeNeeded() override;
-  App* getCustomApp() override;
+  IApp* createCustomApp() override;
 
 private:
-
-  void process(Hal* hal);
-  void exit(Hal* hal);
+  void process(IHal& hal);
+  void exit(IHal& hal);
 
 private:
   bool m_launchGame;
