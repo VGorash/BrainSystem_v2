@@ -39,8 +39,8 @@ constexpr int gameCount = 4;
 constexpr GameConstructor gameConstructors[gameCount] = {createGame, createJeopardyGame, createBrainRingGame, createEightButtonsApp};
 
 constexpr const char* gameNames[gameCount] = {"БЕЗ ОТСЧЕТА", "СВОЯ ИГРА", "БРЕЙН-РИНГ", "8 КНОПОК"};
-constexpr const char* modeNames[2] = {"Без фальстартов", "С фальстартами"};
-constexpr const char* onOffNames[2] = {"Включен", "Выключен"};
+constexpr const char* modeNames[2] = {"БЕЗ ФАЛЬСТАРТОВ", "С ФАЛЬСТАРТАМИ"};
+constexpr const char* onOffNames[2] = {"ВКЛ", "ВЫКЛ"};
 constexpr const char* linkModes[2] = {"V1 (устаревший)", "V2 (обычный)"};
 
 SettingsApp::SettingsApp(bool launchGame) : m_launchGame(launchGame)
