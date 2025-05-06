@@ -23,9 +23,22 @@ IApp* createJeopardyGame(const GameConfig& config)
   return new JeopardyGame(config);
 }
 
-IApp* createBrainRingGame(const GameConfig& config)
+IApp* createBrainRingGame(const GameConfig& config, int primaryTime, int secondaryTime)
 {
-  return new BrainRingGame(config);
+  GameConfig newConfig = config;
+  newConfig.time.primary = primaryTime;
+  newConfig.time.secondary = secondaryTime;
+  return new BrainRingGame(newConfig);
+}
+
+IApp* createBrainRingGame60(const GameConfig& config)
+{
+  return createBrainRingGame(config, 60, 20);
+}
+
+IApp* createBrainRingGame40(const GameConfig& config)
+{
+  return createBrainRingGame(config, 40, 20);
 }
 
 IApp* createEightButtonsApp(const GameConfig& config)
@@ -35,10 +48,10 @@ IApp* createEightButtonsApp(const GameConfig& config)
 
 typedef IApp* (*GameConstructor)(const GameConfig&);
 
-constexpr int gameCount = 4;
-constexpr GameConstructor gameConstructors[gameCount] = {createGame, createJeopardyGame, createBrainRingGame, createEightButtonsApp};
+constexpr int gameCount = 5;
+constexpr GameConstructor gameConstructors[gameCount] = {createGame, createJeopardyGame, createBrainRingGame60, createBrainRingGame40, createEightButtonsApp};
 
-constexpr const char* gameNames[gameCount] = {"БЕЗ ОТСЧЕТА", "СВОЯ ИГРА", "БРЕЙН-РИНГ", "8 КНОПОК"};
+constexpr const char* gameNames[gameCount] = {"БЕЗ ОТСЧЕТА", "СВОЯ ИГРА", "БРЕЙН-РИНГ 60+20", "БРЕЙН-РИНГ 40+20", "8 КНОПОК"};
 constexpr const char* modeNames[2] = {"БЕЗ ФАЛЬСТАРТОВ", "С ФАЛЬСТАРТАМИ"};
 constexpr const char* onOffNames[2] = {"ВКЛ", "ВЫКЛ"};
 constexpr const char* linkModes[2] = {"V1 (устаревший)", "V2 (обычный)"};

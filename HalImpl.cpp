@@ -42,13 +42,6 @@ HalImpl::HalImpl()
 {
   m_blinkTimer.setTime(500);
   m_blinkTimer.setPeriodMode(true);
-
-  m_link = new link::ArduinoUartLink(&Serial);
-}
-
-HalImpl::~HalImpl()
-{
-  delete m_link;
 }
 
 void HalImpl::init()
@@ -97,7 +90,7 @@ void HalImpl::tick()
     m_playerButtons[i].tick();
   }
 
-  m_link->tick();
+  m_link.tick();
 }
 
 ButtonState HalImpl::getButtonState()
@@ -113,9 +106,9 @@ ButtonState HalImpl::getButtonState()
     }
   }
 
-  if(s.player < 0 && m_link->getCommand() == link::Command::PlayerButton)
+  if(s.player < 0 && m_link.getCommand() == link::Command::PlayerButton)
   {
-    s.player = m_link->getData() + NUM_PLAYERS;
+    s.player = m_link.getData() + NUM_PLAYERS;
   }
 
   if(m_startButton.press())
@@ -468,10 +461,9 @@ void HalImpl::loadSettings(ISettings& settings)
 
 void HalImpl::setLinkVersion(link::UartLinkVersion version)
 {
-  if(m_link->getVersion() != version)
+  if(m_link.getVersion() != version)
   {
-    delete m_link;
-    m_link = new link::ArduinoUartLink(&Serial, version);
+    m_link = link::ArduinoUartLink(&Serial, version);
   }
 }
 
@@ -482,10 +474,10 @@ void HalImpl::sendLinkCommand(bool useLink, link::Command command, unsigned int 
     return;
   }
 
-  m_link->send(command, data);
+  m_link.send(command, data);
 }
 
-link::Link* HalImpl::getLink()
+link::Link& HalImpl::getLink()
 {
   return m_link;
 }

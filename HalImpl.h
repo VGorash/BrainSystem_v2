@@ -1,3 +1,4 @@
+#include "HardwareSerial.h"
 #ifndef HAL_IMPL_H
 #define HAL_IMPL_H
 
@@ -36,7 +37,6 @@ class HalImpl : public vgs::IHal
 {
 public:
   HalImpl();
-  ~HalImpl();
 
   void init() override;
   void tick() override;
@@ -74,7 +74,7 @@ public:
 
   // link
   void setLinkVersion(vgs::link::UartLinkVersion);
-  vgs::link::Link* getLink();
+  vgs::link::Link& getLink();
 
 private:
   void showTime(const vgs::GameDisplayInfo& info);
@@ -92,7 +92,7 @@ private:
   bool m_blinkState = 0;
   bool m_blinkingLeds[NUM_PLAYERS];
 
-  vgs::link::UartLink* m_link;
+  vgs::link::ArduinoUartLink m_link = vgs::link::ArduinoUartLink(&Serial);
 
   HalSoundMode m_soundMode;
   bool m_signalLightEnabled = true;

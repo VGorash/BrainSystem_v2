@@ -18,7 +18,7 @@ void EightButtonsApp::init(IHal& hal)
 void EightButtonsApp::tick(IHal& hal)
 {
   HalImpl* halImpl = (HalImpl*) &hal;
-  link::Link* linkHandle = halImpl->getLink();
+  link::Link& linkHandle = halImpl->getLink();
   ButtonState buttonState = halImpl->getButtonState();
 
   if(buttonState.menu)
@@ -27,17 +27,17 @@ void EightButtonsApp::tick(IHal& hal)
     return;
   }
 
-  switch(linkHandle->getCommand())
+  switch(linkHandle.getCommand())
   {
     case link::Command::PlayerLedOn:
     {
-      halImpl->playerLedOn(linkHandle->getData(), false);
+      halImpl->playerLedOn(linkHandle.getData(), false);
     }
     break;
 
     case link::Command::PlayerLedBlink:
     {
-      halImpl->playerLedBlink(linkHandle->getData(), false);
+      halImpl->playerLedBlink(linkHandle.getData(), false);
     }
     break;
 
@@ -56,7 +56,7 @@ void EightButtonsApp::tick(IHal& hal)
 
   if(buttonState.player >= 0 && buttonState.player < NUM_PLAYERS)
   {
-    linkHandle->send(link::Command::PlayerButton, buttonState.player);
+    linkHandle.send(link::Command::PlayerButton, buttonState.player);
   }
 }
 
