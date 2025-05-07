@@ -9,8 +9,7 @@
 #include "src/Framework/Core/Hal.h"
 #include "src/Framework/Timer.h"
 #include "src/Link/ArduinoUartLink.h"
-
-#include "Settings.h"
+#include "src/Settings/Settings.h"
 
 #include "Display.h"
 

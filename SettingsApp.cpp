@@ -1,7 +1,7 @@
 #include "SettingsApp.h"
 #include "HalImpl.h"
 
-#include "ListSettingsItem.h"
+#include "src/Settings/ListSettingsItem.h"
 
 #include "src/Framework/Game.h"
 #include "src/Framework/JeopardyGame.h"

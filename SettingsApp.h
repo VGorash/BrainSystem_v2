@@ -2,7 +2,7 @@
 #define SETTINGS_APP_H
 
 #include "src/Framework/Core/App.h"
-#include "Settings.h"
+#include "src/Settings/Settings.h"
 
 namespace vgs
 {
