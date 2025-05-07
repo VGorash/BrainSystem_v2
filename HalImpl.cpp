@@ -278,12 +278,12 @@ void HalImpl::setSoundMode(HalSoundMode mode)
   m_soundMode = mode;
 }
 
-bool pressTimeEnabled(const vgs::GameDisplayInfo& info)
+bool pressTimeEnabled(const GameDisplayInfo& info)
 {
   return info.pressTime >= 0 && info.mode == GameMode::Falstart;
 }
 
-void HalImpl::showTime(const vgs::GameDisplayInfo& info)
+void HalImpl::showTime(const GameDisplayInfo& info)
 {
   switch(info.state)
   {
@@ -333,7 +333,7 @@ void HalImpl::showTime(const vgs::GameDisplayInfo& info)
 }
 
 
-void HalImpl::showPressTime(const vgs::GameDisplayInfo& info)
+void HalImpl::showPressTime(const GameDisplayInfo& info)
 {
   if (!pressTimeEnabled(info))
   {
@@ -395,24 +395,28 @@ void HalImpl::updateDisplay(const GameDisplayInfo& info)
 
 void HalImpl::updateDisplay(const CustomDisplayInfo& info)
 {
-  if(String(info.name) != String("eight_buttons"))
+  if(info.type == DisplayInfoSettings)
   {
+    updateDisplay((settings::Settings*)info.data);
     return;
   }
-  m_state.display_mode = DisplayMode::EightButtons;
+  if(info.type == DisplayInfoEightButtons)
+  {
+    m_state.display_mode = DisplayMode::EightButtons;
 
-  m_display.clear();
-  m_display.setScale(2);
-  m_display.setCursor(16, 1);
-  m_display.print("8 КНОПОК");
-  m_display.setScale(1);
-  m_display.setCursor(6, 4);
-  m_display.print("управляйте с другой");
-  m_display.setCursor(35, 6);
-  m_display.print("системы");
+    m_display.clear();
+    m_display.setScale(2);
+    m_display.setCursor(16, 1);
+    m_display.print("8 КНОПОК");
+    m_display.setScale(1);
+    m_display.setCursor(6, 4);
+    m_display.print("управляйте с другой");
+    m_display.setCursor(40, 6);
+    m_display.print("системы");
+  }
 }
 
-void HalImpl::updateDisplay(const SettingsDisplayInfo& info)
+void HalImpl::updateDisplay(const settings::Settings* settings)
 {
   m_state.display_mode = DisplayMode::Settings;
 
@@ -423,11 +427,11 @@ void HalImpl::updateDisplay(const SettingsDisplayInfo& info)
 
   m_display.setScale(2);
   m_display.setCursor(0, 3);
-  m_display.print(info.settings->getCurrentItem().getName());
+  m_display.print(settings->getCurrentItem().getName());
 
   m_display.setScale(1);
   m_display.setCursor(0, 6);
-  m_display.print(info.settings->getCurrentItem().getValueStr());
+  m_display.print(settings->getCurrentItem().getValueStr());
   m_display.update();
 }
 
@@ -436,7 +440,7 @@ unsigned long HalImpl::getTimeMillis()
   return millis();
 }
 
-void HalImpl::saveSettings(const ISettings& settings)
+void HalImpl::saveSettings(const settings::Settings& settings)
 {
   int data[settings.size()];
   settings.dumpData(data);
@@ -447,7 +451,7 @@ void HalImpl::saveSettings(const ISettings& settings)
   }
 }
 
-void HalImpl::loadSettings(ISettings& settings)
+void HalImpl::loadSettings(settings::Settings& settings)
 {
   int data[settings.size()];
 

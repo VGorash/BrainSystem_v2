@@ -1,6 +1,8 @@
 #include "SettingsApp.h"
 #include "HalImpl.h"
 
+#include "ListSettingsItem.h"
+
 #include "src/Framework/Game.h"
 #include "src/Framework/JeopardyGame.h"
 #include "src/Framework/BrainRingGame.h"
@@ -58,16 +60,18 @@ constexpr const char* linkModes[2] = {"V1 (устаревший)", "V2 (обыч
 
 SettingsApp::SettingsApp(bool launchGame) : m_launchGame(launchGame)
 {
-  m_settings.addItem(new ListSettingsItem("Тип игры", gameCount, gameNames));  
-  m_settings.addItem(new ListSettingsItem("Режим", 2, modeNames));
-  m_settings.addItem(new ListSettingsItem("Звук", 2, onOffNames));
-  m_settings.addItem(new ListSettingsItem("Свет", 2, onOffNames));
-  m_settings.addItem(new ListSettingsItem("Link", 2, linkModes));
+  m_settings.addItem(new settings::ListSettingsItem("Тип игры", gameCount, gameNames));  
+  m_settings.addItem(new settings::ListSettingsItem("Режим", 2, modeNames));
+  m_settings.addItem(new settings::ListSettingsItem("Звук", 2, onOffNames));
+  m_settings.addItem(new settings::ListSettingsItem("Свет", 2, onOffNames));
+  m_settings.addItem(new settings::ListSettingsItem("Link", 2, linkModes));
 }
 
 void SettingsApp::init(IHal& hal)
 {
-  hal.loadSettings(m_settings);
+  HalImpl* halImpl = (HalImpl*) &hal;
+
+  halImpl->loadSettings(m_settings);
 
   if(m_launchGame)
   {
@@ -87,8 +91,9 @@ void SettingsApp::tick(IHal& hal)
 
   if(m_displayDirty)
   {
-    SettingsDisplayInfo info;
-    info.settings = &m_settings;
+    CustomDisplayInfo info;
+    info.type = DisplayInfoSettings;
+    info.data = (void*)&m_settings;
     hal.updateDisplay(info);
     m_displayDirty = false;
   }

@@ -11,7 +11,7 @@ EightButtonsApp::EightButtonsApp()
 void EightButtonsApp::init(IHal& hal)
 {
   CustomDisplayInfo info;
-  info.name = "eight_buttons";
+  info.type = DisplayInfoEightButtons;
   hal.updateDisplay(info);
 }
 

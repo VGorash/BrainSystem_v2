@@ -2,7 +2,7 @@
 #define SETTINGS_APP_H
 
 #include "src/Framework/Core/App.h"
-#include "src/Framework/Core/Settings.h"
+#include "Settings.h"
 
 namespace vgs
 {
@@ -29,7 +29,7 @@ private:
   bool m_settingsDirty = false;
   bool m_shouldClose = false;
 
-  Settings m_settings;
+  settings::Settings m_settings;
 
 };
 

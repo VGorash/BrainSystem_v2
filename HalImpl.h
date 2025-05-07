@@ -10,6 +10,8 @@
 #include "src/Framework/Timer.h"
 #include "src/Link/ArduinoUartLink.h"
 
+#include "Settings.h"
+
 #include "Display.h"
 
 
@@ -26,6 +28,12 @@ enum class DisplayMode
   Game,
   Settings, 
   EightButtons
+};
+
+enum CustomDisplayInfoType
+{
+  DisplayInfoSettings = 0,
+  DisplayInfoEightButtons
 };
 
 struct HalState
@@ -62,15 +70,14 @@ public:
 
   //display
   void updateDisplay(const vgs::GameDisplayInfo& info) override;
-  void updateDisplay(const vgs::SettingsDisplayInfo& info) override;
   void updateDisplay(const vgs::CustomDisplayInfo& info) override;
 
   //time
   unsigned long getTimeMillis() override;
 
   //settings
-  void saveSettings(const vgs::ISettings& settings) override;
-  void loadSettings(vgs::ISettings& settings) override;
+  void saveSettings(const vgs::settings::Settings& settings);
+  void loadSettings(vgs::settings::Settings& settings);
 
   // link
   void setLinkVersion(vgs::link::UartLinkVersion);
@@ -79,6 +86,8 @@ public:
 private:
   void showTime(const vgs::GameDisplayInfo& info);
   void showPressTime(const vgs::GameDisplayInfo& info);
+
+  void updateDisplay(const vgs::settings::Settings* settings);
 
   void sendLinkCommand(bool useLink, vgs::link::Command command, unsigned int data = 0);
 

@@ -4,3 +4,6 @@
 [submodule "src/Link"]
 	path = src/Link
 	url = git@github.com:VGorash/BrainSystem_Link.git
+[submodule "src/Settings"]
+	path = src/Settings
+	url = git@github.com:VGorash/BrainSystem_Settings.git
