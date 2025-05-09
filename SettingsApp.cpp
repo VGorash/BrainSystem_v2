@@ -10,11 +10,6 @@
 
 using namespace vgs;
 
-struct GameInfo
-{
-  IApp* (*constructor)(const GameConfig&);
-};
-
 IApp* createGame(const GameConfig& config)
 {
   return new Game(config);

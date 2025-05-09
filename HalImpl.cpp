@@ -307,8 +307,10 @@ void HalImpl::showTime(const GameDisplayInfo& info)
     {
       m_display.setCursor(42, 3);
 
-      if(info.gameTime > 0)
+      if(info.gameTime >= 0)
       {
+        sendLinkCommand(true, link::Command::UpdateTime, info.gameTime);
+
         if(info.gameTime < 10)
         {
           m_display.print(0);
