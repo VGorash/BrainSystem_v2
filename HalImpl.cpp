@@ -303,6 +303,13 @@ void HalImpl::showTime(const GameDisplayInfo& info)
     }
     break;
 
+    case GameState::Idle:
+    {
+      m_display.setCursor(42, 3);
+      m_display.print("--");
+    }
+    break;
+
     case GameState::Countdown:
     {
       m_display.setCursor(42, 3);
@@ -322,13 +329,6 @@ void HalImpl::showTime(const GameDisplayInfo& info)
       {
         m_display.print("--");
       }
-    }
-    break;
-
-    case GameState::Idle:
-    {
-      m_display.setCursor(42, 3);
-      m_display.print("--");
     }
     break;
   }
@@ -366,7 +366,8 @@ void HalImpl::showPressTime(const GameDisplayInfo& info)
 
 void HalImpl::updateDisplay(const GameDisplayInfo& info)
 {
-  m_displayForceUpdate = m_displayForceUpdate || (m_state.display_mode != DisplayMode::Game);
+  bool questionsMode = String(info.name) == String("ЧГК");
+  m_displayForceUpdate = m_displayForceUpdate || (m_state.display_mode != DisplayMode::Game) || (questionsMode && info.customInt > 0 && info.state == GameState::Idle);
   m_state.display_mode = DisplayMode::Game;
 
   if(m_displayForceUpdate)
@@ -377,8 +378,25 @@ void HalImpl::updateDisplay(const GameDisplayInfo& info)
     m_display.setScale(1);
     m_display.home();
     m_display.print(info.name);
-    m_display.setCursor(110, 0);
-    m_display.print(modeNames[static_cast<int>(info.mode)]);
+
+    if(questionsMode)
+    {
+      m_display.setCursor(80, 0);
+      if(info.customInt == 1)
+      {
+        m_display.print("ОБЫЧНЫЙ");
+      }
+      else
+      {
+        m_display.print("БЛИЦ ");
+        m_display.print(info.customInt);
+      }
+    }
+    else
+    {
+      m_display.setCursor(110, 0);
+      m_display.print(modeNames[static_cast<int>(info.mode)]);
+    }
 
     if (m_soundMode == HalSoundMode::Disabled) {
       m_display.setCursor(38, 7);
